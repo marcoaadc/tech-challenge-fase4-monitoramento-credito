@@ -1,0 +1,57 @@
+{
+  "model_type": "xgboost",
+  "train_months": [
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10"
+  ],
+  "recent_months": [
+    "2025-08",
+    "2025-09",
+    "2025-10"
+  ],
+  "test_months": [
+    "2025-11",
+    "2025-12"
+  ],
+  "test_rows": 4000,
+  "strategies": {
+    "campeao": {
+      "train_rows": 8989,
+      "threshold": 0.2894,
+      "roc_auc": 0.6319,
+      "ks": 0.1864,
+      "brier": 0.2392,
+      "calibration_gap": 0.056,
+      "approval_rate": 0.5535,
+      "bad_rate_approved": 0.2967
+    },
+    "retreino_janela_recente": {
+      "train_rows": 6000,
+      "threshold": 0.3471,
+      "roc_auc": 0.6985,
+      "ks": 0.283,
+      "brier": 0.21,
+      "calibration_gap": 0.0199,
+      "approval_rate": 0.5833,
+      "bad_rate_approved": 0.2606
+    },
+    "retreino_referencia_mais_producao": {
+      "train_rows": 28989,
+      "threshold": 0.2682,
+      "roc_auc": 0.6864,
+      "ks": 0.2607,
+      "brier": 0.2174,
+      "calibration_gap": 0.0222,
+      "approval_rate": 0.4955,
+      "bad_rate_approved": 0.2644
+    }
+  }
+}

@@ -1,0 +1,201 @@
+# HELP creditwatch_stage_runs_total Execucoes de estagios do pipeline por resultado.
+# TYPE creditwatch_stage_runs_total counter
+creditwatch_stage_runs_total{stage="load_baselines",status="success"} 1.0
+creditwatch_stage_runs_total{stage="read_batch",status="success"} 13.0
+creditwatch_stage_runs_total{stage="contract",status="success"} 12.0
+creditwatch_stage_runs_total{stage="score",status="success"} 12.0
+creditwatch_stage_runs_total{stage="drift",status="success"} 12.0
+creditwatch_stage_runs_total{stage="performance",status="success"} 12.0
+creditwatch_stage_runs_total{stage="evidently",status="success"} 3.0
+creditwatch_stage_runs_total{stage="contract",status="blocked"} 1.0
+# HELP creditwatch_stage_duration_seconds Duracao dos estagios do pipeline.
+# TYPE creditwatch_stage_duration_seconds histogram
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="load_baselines"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="load_baselines"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_count{stage="load_baselines"} 1.0
+creditwatch_stage_duration_seconds_sum{stage="load_baselines"} 0.12473000000000001
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_count{stage="read_batch"} 13.0
+creditwatch_stage_duration_seconds_sum{stage="read_batch"} 0.15785000000000002
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="contract"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="contract"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="contract"} 13.0
+creditwatch_stage_duration_seconds_count{stage="contract"} 13.0
+creditwatch_stage_duration_seconds_sum{stage="contract"} 0.91267
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="score"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="score"} 12.0
+creditwatch_stage_duration_seconds_count{stage="score"} 12.0
+creditwatch_stage_duration_seconds_sum{stage="score"} 0.31904
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="drift"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="drift"} 2.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="drift"} 12.0
+creditwatch_stage_duration_seconds_count{stage="drift"} 12.0
+creditwatch_stage_duration_seconds_sum{stage="drift"} 1.50271
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="performance"} 12.0
+creditwatch_stage_duration_seconds_count{stage="performance"} 12.0
+creditwatch_stage_duration_seconds_sum{stage="performance"} 0.3713600000000001
+creditwatch_stage_duration_seconds_bucket{le="0.05",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.1",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.25",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="0.5",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="1.0",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="2.5",stage="evidently"} 0.0
+creditwatch_stage_duration_seconds_bucket{le="5.0",stage="evidently"} 2.0
+creditwatch_stage_duration_seconds_bucket{le="10.0",stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_bucket{le="30.0",stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_bucket{le="60.0",stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_bucket{le="120.0",stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_bucket{le="+Inf",stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_count{stage="evidently"} 3.0
+creditwatch_stage_duration_seconds_sum{stage="evidently"} 12.81869
+# HELP creditwatch_rows_total Linhas processadas por destino.
+# TYPE creditwatch_rows_total counter
+creditwatch_rows_total{outcome="scored"} 24000.0
+creditwatch_rows_total{outcome="quarantined"} 2040.0
+# HELP creditwatch_batches_total Lotes processados por resultado.
+# TYPE creditwatch_batches_total counter
+creditwatch_batches_total{status="scored"} 12.0
+creditwatch_batches_total{status="blocked"} 1.0
+# HELP creditwatch_contract_violations_total Violacoes do contrato de dados por regra.
+# TYPE creditwatch_contract_violations_total counter
+creditwatch_contract_violations_total{rule="DQ-01"} 1.0
+creditwatch_contract_violations_total{rule="DQ-02"} 1.0
+creditwatch_contract_violations_total{rule="DQ-03"} 1.0
+creditwatch_contract_violations_total{rule="DQ-04"} 1.0
+creditwatch_contract_violations_total{rule="DQ-05"} 1.0
+creditwatch_contract_violations_total{rule="DQ-07"} 1.0
+creditwatch_contract_violations_total{rule="DQ-09"} 1.0
+# HELP creditwatch_alerts_total Alertas disparados.
+# TYPE creditwatch_alerts_total counter
+creditwatch_alerts_total{kind="data_drift",severity="warning"} 1.0
+creditwatch_alerts_total{kind="data_drift",severity="critical"} 8.0
+creditwatch_alerts_total{kind="target_drift",severity="warning"} 2.0
+creditwatch_alerts_total{kind="data_quality",severity="critical"} 1.0
+creditwatch_alerts_total{kind="prediction_drift",severity="warning"} 5.0
+creditwatch_alerts_total{kind="target_drift",severity="critical"} 5.0
+creditwatch_alerts_total{kind="prediction_drift",severity="critical"} 1.0
+creditwatch_alerts_total{kind="performance",severity="warning"} 1.0
+creditwatch_alerts_total{kind="performance",severity="critical"} 3.0
+creditwatch_alerts_total{kind="calibration",severity="warning"} 2.0
+# HELP creditwatch_feature_psi PSI de cada feature no ultimo lote, contra a referencia.
+# TYPE creditwatch_feature_psi gauge
+creditwatch_feature_psi{feature="pay_amt_4"} 0.03594
+creditwatch_feature_psi{feature="bill_trend"} 0.65827
+creditwatch_feature_psi{feature="bill_amt_3"} 0.05505
+creditwatch_feature_psi{feature="max_delay"} 0.27876
+creditwatch_feature_psi{feature="pay_amt_6"} 0.094
+creditwatch_feature_psi{feature="bill_amt_6"} 0.05224
+creditwatch_feature_psi{feature="utilization_1"} 0.90483
+creditwatch_feature_psi{feature="months_delayed"} 0.29141
+creditwatch_feature_psi{feature="pay_status_3"} 0.20821
+creditwatch_feature_psi{feature="limit_bal"} 0.23587
+creditwatch_feature_psi{feature="pay_amt_3"} 0.03371
+creditwatch_feature_psi{feature="bill_amt_4"} 0.05743
+creditwatch_feature_psi{feature="pay_amt_5"} 0.0752
+creditwatch_feature_psi{feature="pay_amt_2"} 0.09292
+creditwatch_feature_psi{feature="age"} 0.12733
+creditwatch_feature_psi{feature="pay_status_4"} 0.14851
+creditwatch_feature_psi{feature="pay_status_6"} 0.12474
+creditwatch_feature_psi{feature="bill_amt_5"} 0.05664
+creditwatch_feature_psi{feature="pay_status_1"} 0.30167
+creditwatch_feature_psi{feature="payment_ratio_1"} 0.51893
+creditwatch_feature_psi{feature="payment_ratio_avg"} 0.38713
+creditwatch_feature_psi{feature="bill_amt_2"} 0.06542
+creditwatch_feature_psi{feature="pay_status_5"} 0.13378
+creditwatch_feature_psi{feature="utilization_avg"} 0.56968
+creditwatch_feature_psi{feature="bill_amt_1"} 0.08945
+creditwatch_feature_psi{feature="pay_status_2"} 0.34392
+creditwatch_feature_psi{feature="education"} 0.0149
+creditwatch_feature_psi{feature="marriage"} 0.02641
+creditwatch_feature_psi{feature="pay_amt_1"} 0.10466
+creditwatch_feature_psi{feature="sex"} 0.00043
+# HELP creditwatch_drifted_features Numero de features com drift no ultimo lote.
+# TYPE creditwatch_drifted_features gauge
+creditwatch_drifted_features 19.0
+# HELP creditwatch_drift_share Fracao de features com drift no ultimo lote.
+# TYPE creditwatch_drift_share gauge
+creditwatch_drift_share 0.6333
+# HELP creditwatch_score_psi PSI do score (drift de predicao) no ultimo lote.
+# TYPE creditwatch_score_psi gauge
+creditwatch_score_psi 0.23292
+# HELP creditwatch_approval_rate Taxa de aprovacao no ultimo lote.
+# TYPE creditwatch_approval_rate gauge
+creditwatch_approval_rate 0.557
+# HELP creditwatch_model_roc_auc ROC AUC no ultimo lote com rotulo maduro.
+# TYPE creditwatch_model_roc_auc gauge
+creditwatch_model_roc_auc 0.6129206151967529
+# HELP creditwatch_model_ks KS do modelo no ultimo lote com rotulo maduro.
+# TYPE creditwatch_model_ks gauge
+creditwatch_model_ks 0.16660360484314804
+# HELP creditwatch_default_rate Taxa de inadimplencia no ultimo lote com rotulo maduro.
+# TYPE creditwatch_default_rate gauge
+creditwatch_default_rate 0.368
+# HELP creditwatch_bad_rate_approved Inadimplencia entre os aprovados no ultimo lote com rotulo.
+# TYPE creditwatch_bad_rate_approved gauge
+creditwatch_bad_rate_approved 0.30700179533213645
+# HELP creditwatch_last_batch_info Ultimo lote processado (valor constante 1).
+# TYPE creditwatch_last_batch_info gauge
+creditwatch_last_batch_info{batch="2025-12",model_version="20261105-81a0ccd0"} 1.0
+# HELP creditwatch_last_run_timestamp_seconds Instante do termino da ultima execucao.
+# TYPE creditwatch_last_run_timestamp_seconds gauge
+creditwatch_last_run_timestamp_seconds 1.7939225615513842e+09

@@ -1,0 +1,27 @@
+{
+  "batch": "raw",
+  "contract": "credit_batch_with_target",
+  "status": "bloqueado",
+  "validated_at": "2026-11-05T23:48:41+00:00",
+  "n_rows": 30000,
+  "n_columns": 25,
+  "rows_with_failures": 399,
+  "violations": [
+    {
+      "rule_id": "DQ-05",
+      "title": "Domínio dos categóricos",
+      "description": "sex, education e marriage restritos ao dicionário de dados.",
+      "columns": [
+        "education",
+        "marriage"
+      ],
+      "n_failures": 399,
+      "examples": [
+        "5",
+        "6",
+        "0"
+      ]
+    }
+  ],
+  "warnings": []
+}

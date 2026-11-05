@@ -1,0 +1,44 @@
+{
+  "source": {
+    "name": "Default of Credit Card Clients (UCI Machine Learning Repository)",
+    "url": "https://archive.ics.uci.edu/static/public/350/default+of+credit+card+clients.zip",
+    "doi": "10.24432/C55S3H",
+    "license": "CC BY 4.0",
+    "raw_file": "data/raw/default_of_credit_card_clients.csv",
+    "raw_sha256": "4edce6da569b2c30788a85fd98a9bafb1a983e8ca1a7aac875dd7ff853cbd0bb"
+  },
+  "raw_validation": {
+    "status": "bloqueado",
+    "violated_rules": [
+      "DQ-05"
+    ],
+    "rows_with_failures": 399
+  },
+  "cleaning": {
+    "rows_in": 30000,
+    "rows_out": 29965,
+    "education_recoded": 345,
+    "marriage_recoded": 54,
+    "duplicates_removed": 35
+  },
+  "clean_validation": {
+    "status": "aprovado",
+    "warnings": []
+  },
+  "reference": {
+    "path": "data/reference/reference.parquet",
+    "sha256": "81a0ccd0eb43fd6ec81588f49853c6045a2f8ee19fe9d34f774dd49c3cd8e3b0",
+    "rows": 14982,
+    "splits": {
+      "train": 8989,
+      "test": 2997,
+      "val": 2996
+    },
+    "default_rate": 0.2213
+  },
+  "production_pool": {
+    "path": "data/interim/production_pool.parquet",
+    "rows": 14983,
+    "default_rate": 0.2213
+  }
+}

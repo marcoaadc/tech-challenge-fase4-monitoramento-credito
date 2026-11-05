@@ -1,0 +1,11 @@
+{
+  "batch": "reference_candidate",
+  "contract": "credit_batch_with_target",
+  "status": "aprovado",
+  "validated_at": "2026-11-05T23:48:41+00:00",
+  "n_rows": 29965,
+  "n_columns": 25,
+  "rows_with_failures": 0,
+  "violations": [],
+  "warnings": []
+}

@@ -1,0 +1,132 @@
+{
+  "plan": {
+    "month": "2025-12",
+    "phase": "drift_de_conceito",
+    "inflation": 0.7,
+    "stress": 0.5,
+    "new_profiles": 0.75,
+    "concept": 1.0
+  },
+  "sample_size": 6000,
+  "mechanisms": [
+    "inflation",
+    "stress",
+    "new_profiles",
+    "concept"
+  ],
+  "baseline": {
+    "roc_auc": 0.7670217694120292,
+    "ks": 0.40789768416489036,
+    "default_rate": 0.2225,
+    "bad_rate_approved": 0.1330706938060845,
+    "approval_rate": 0.7615,
+    "score_psi": 0.005167514352273188,
+    "n_drifted": 0.0
+  },
+  "full": {
+    "roc_auc": 0.6102955202674663,
+    "ks": 0.13874637363543255,
+    "default_rate": 0.3465,
+    "bad_rate_approved": 0.299583550234253,
+    "approval_rate": 0.6403333333333333,
+    "score_psi": 0.11375819599805669,
+    "n_drifted": 18.0
+  },
+  "total_effect": {
+    "roc_auc": -0.1567262491445629,
+    "ks": -0.26915131052945784,
+    "default_rate": 0.12399999999999997,
+    "bad_rate_approved": 0.1665128564281685,
+    "approval_rate": -0.12116666666666664,
+    "score_psi": 0.1085906816457835,
+    "n_drifted": 18.0
+  },
+  "single": {
+    "inflation": {
+      "roc_auc": -0.00796175199007676,
+      "ks": -0.007387068415284748,
+      "default_rate": 0.0,
+      "bad_rate_approved": 0.004335522699810468,
+      "approval_rate": 0.016000000000000014,
+      "score_psi": 0.027371086331754314,
+      "n_drifted": 8.0
+    },
+    "stress": {
+      "roc_auc": 0.03618010520341153,
+      "ks": 0.07642380235881191,
+      "default_rate": 0.06033333333333332,
+      "bad_rate_approved": -0.0023194590777247392,
+      "approval_rate": -0.12033333333333329,
+      "score_psi": 0.0671320203352884,
+      "n_drifted": 5.0
+    },
+    "new_profiles": {
+      "roc_auc": 0.010335447056587954,
+      "ks": 0.016992068691922546,
+      "default_rate": 0.026999999999999996,
+      "bad_rate_approved": 0.007474844797706548,
+      "approval_rate": -0.04049999999999998,
+      "score_psi": 0.013841813106622587,
+      "n_drifted": 2.0
+    },
+    "concept": {
+      "roc_auc": -0.14707300197463535,
+      "ks": -0.2353699479222513,
+      "default_rate": 0.08299999999999999,
+      "bad_rate_approved": 0.1361348216239877,
+      "approval_rate": 0.0,
+      "score_psi": 0.0,
+      "n_drifted": 0.0
+    }
+  },
+  "shapley": {
+    "roc_auc": {
+      "inflation": -0.011774688095336956,
+      "stress": 0.01740950729007209,
+      "new_profiles": -0.0015193394315231403,
+      "concept": -0.1608417289077749
+    },
+    "ks": {
+      "inflation": -0.018370333062267916,
+      "stress": 0.03358166933266114,
+      "new_profiles": -0.00543384097665358,
+      "concept": -0.27892880582319746
+    },
+    "default_rate": {
+      "inflation": 0.01168055555555555,
+      "stress": 0.027652777777777773,
+      "new_profiles": 0.019125,
+      "concept": 0.06554166666666665
+    },
+    "bad_rate_approved": {
+      "inflation": 0.01922911454797737,
+      "stress": -0.008364234852814189,
+      "new_profiles": 0.011018048829046001,
+      "concept": 0.14462992790395932
+    },
+    "approval_rate": {
+      "inflation": 0.02038888888888888,
+      "stress": -0.11236111111111109,
+      "new_profiles": -0.029194444444444433,
+      "concept": 0.0
+    },
+    "score_psi": {
+      "inflation": 0.013270063562663227,
+      "stress": 0.06491176834847376,
+      "new_profiles": 0.0304088497346465,
+      "concept": 0.0
+    },
+    "n_drifted": {
+      "inflation": 7.666666666666667,
+      "stress": 7.166666666666666,
+      "new_profiles": 3.1666666666666665,
+      "concept": 0.0
+    }
+  },
+  "mechanism_labels": {
+    "inflation": "Inflação (faturas nominais)",
+    "stress": "Aperto financeiro (mais atrasos)",
+    "new_profiles": "Novos perfis (jovens, limite baixo)",
+    "concept": "Drift de conceito (P(y|x))"
+  }
+}

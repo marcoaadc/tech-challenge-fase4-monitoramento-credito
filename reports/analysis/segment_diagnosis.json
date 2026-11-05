@@ -1,0 +1,184 @@
+{
+  "segments": [
+    {
+      "period": "referencia",
+      "segment": "em dia, baixa utilização",
+      "n": 2723,
+      "share": 0.4544,
+      "observed_default_rate": 0.1348,
+      "predicted_default_rate": 0.1377,
+      "gap": -0.0029
+    },
+    {
+      "period": "referencia",
+      "segment": "em dia, alavancado",
+      "n": 1903,
+      "share": 0.3175,
+      "observed_default_rate": 0.1445,
+      "predicted_default_rate": 0.1402,
+      "gap": 0.0043
+    },
+    {
+      "period": "referencia",
+      "segment": "em atraso",
+      "n": 1367,
+      "share": 0.2281,
+      "observed_default_rate": 0.5004,
+      "predicted_default_rate": 0.5106,
+      "gap": -0.0102
+    },
+    {
+      "period": "estavel",
+      "segment": "em dia, baixa utilização",
+      "n": 2749,
+      "share": 0.4582,
+      "observed_default_rate": 0.1124,
+      "predicted_default_rate": 0.132,
+      "gap": -0.0196
+    },
+    {
+      "period": "estavel",
+      "segment": "em dia, alavancado",
+      "n": 1886,
+      "share": 0.3143,
+      "observed_default_rate": 0.1575,
+      "predicted_default_rate": 0.1402,
+      "gap": 0.0173
+    },
+    {
+      "period": "estavel",
+      "segment": "em atraso",
+      "n": 1365,
+      "share": 0.2275,
+      "observed_default_rate": 0.4967,
+      "predicted_default_rate": 0.4936,
+      "gap": 0.0031
+    },
+    {
+      "period": "drift_de_dados",
+      "segment": "em dia, baixa utilização",
+      "n": 3398,
+      "share": 0.3398,
+      "observed_default_rate": 0.1351,
+      "predicted_default_rate": 0.1378,
+      "gap": -0.0028
+    },
+    {
+      "period": "drift_de_dados",
+      "segment": "em dia, alavancado",
+      "n": 3036,
+      "share": 0.3036,
+      "observed_default_rate": 0.1535,
+      "predicted_default_rate": 0.1527,
+      "gap": 0.0008
+    },
+    {
+      "period": "drift_de_dados",
+      "segment": "em atraso",
+      "n": 3566,
+      "share": 0.3566,
+      "observed_default_rate": 0.5656,
+      "predicted_default_rate": 0.5101,
+      "gap": 0.0555
+    },
+    {
+      "period": "drift_de_conceito",
+      "segment": "em dia, baixa utilização",
+      "n": 1941,
+      "share": 0.2426,
+      "observed_default_rate": 0.1484,
+      "predicted_default_rate": 0.1538,
+      "gap": -0.0054
+    },
+    {
+      "period": "drift_de_conceito",
+      "segment": "em dia, alavancado",
+      "n": 2337,
+      "share": 0.2921,
+      "observed_default_rate": 0.371,
+      "predicted_default_rate": 0.1572,
+      "gap": 0.2138
+    },
+    {
+      "period": "drift_de_conceito",
+      "segment": "em atraso",
+      "n": 3722,
+      "share": 0.4652,
+      "observed_default_rate": 0.4702,
+      "predicted_default_rate": 0.5001,
+      "gap": -0.03
+    }
+  ],
+  "root_cause_ranking": [
+    {
+      "feature": "max_delay",
+      "psi": 0.27876,
+      "importance": 0.26508,
+      "impact": 0.07389,
+      "severity": "critical"
+    },
+    {
+      "feature": "pay_status_1",
+      "psi": 0.30167,
+      "importance": 0.19007,
+      "impact": 0.05734,
+      "severity": "critical"
+    },
+    {
+      "feature": "months_delayed",
+      "psi": 0.29141,
+      "importance": 0.1665,
+      "impact": 0.04852,
+      "severity": "critical"
+    },
+    {
+      "feature": "utilization_1",
+      "psi": 0.90483,
+      "importance": 0.01772,
+      "impact": 0.01603,
+      "severity": "critical"
+    },
+    {
+      "feature": "utilization_avg",
+      "psi": 0.56968,
+      "importance": 0.01893,
+      "impact": 0.01078,
+      "severity": "critical"
+    },
+    {
+      "feature": "pay_status_2",
+      "psi": 0.34392,
+      "importance": 0.03092,
+      "impact": 0.01063,
+      "severity": "critical"
+    },
+    {
+      "feature": "bill_trend",
+      "psi": 0.65827,
+      "importance": 0.0144,
+      "impact": 0.00948,
+      "severity": "critical"
+    },
+    {
+      "feature": "payment_ratio_1",
+      "psi": 0.51893,
+      "importance": 0.01553,
+      "impact": 0.00806,
+      "severity": "critical"
+    },
+    {
+      "feature": "payment_ratio_avg",
+      "psi": 0.38713,
+      "importance": 0.01397,
+      "impact": 0.00541,
+      "severity": "critical"
+    },
+    {
+      "feature": "pay_status_3",
+      "psi": 0.20821,
+      "importance": 0.02265,
+      "impact": 0.00472,
+      "severity": "warning"
+    }
+  ]
+}

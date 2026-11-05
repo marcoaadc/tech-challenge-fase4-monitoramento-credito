@@ -1,0 +1,104 @@
+{
+  "batch": "2025-07-r1",
+  "contract": "credit_batch",
+  "status": "bloqueado",
+  "validated_at": "2026-11-05T23:49:09+00:00",
+  "n_rows": 2040,
+  "n_columns": 26,
+  "rows_with_failures": 246,
+  "violations": [
+    {
+      "rule_id": "DQ-01",
+      "title": "Completude",
+      "description": "Nenhuma coluna obrigatória pode conter valores nulos.",
+      "columns": [
+        "limit_bal"
+      ],
+      "n_failures": 60,
+      "examples": []
+    },
+    {
+      "rule_id": "DQ-02",
+      "title": "Idade válida",
+      "description": "Idade entre 18 e 100 anos (capacidade civil para contratar crédito).",
+      "columns": [
+        "age"
+      ],
+      "n_failures": 40,
+      "examples": [
+        "176",
+        "13",
+        "134",
+        "17",
+        "159"
+      ]
+    },
+    {
+      "rule_id": "DQ-03",
+      "title": "Limite de crédito",
+      "description": "Limite entre 1.000 e 1.000.000 (teto da política de crédito).",
+      "columns": [
+        "limit_bal"
+      ],
+      "n_failures": 20,
+      "examples": [
+        "3000000",
+        "8000000",
+        "6000000",
+        "24000000",
+        "10000000"
+      ]
+    },
+    {
+      "rule_id": "DQ-04",
+      "title": "Unicidade",
+      "description": "customer_id não pode se repetir dentro do lote.",
+      "columns": [
+        "customer_id"
+      ],
+      "n_failures": 80,
+      "examples": []
+    },
+    {
+      "rule_id": "DQ-05",
+      "title": "Domínio dos categóricos",
+      "description": "sex, education e marriage restritos ao dicionário de dados.",
+      "columns": [
+        "education",
+        "sex"
+      ],
+      "n_failures": 40,
+      "examples": [
+        "0",
+        "9"
+      ]
+    },
+    {
+      "rule_id": "DQ-07",
+      "title": "Pagamentos não negativos",
+      "description": "pay_amt_1..6 maiores ou iguais a zero.",
+      "columns": [
+        "pay_amt_1"
+      ],
+      "n_failures": 20,
+      "examples": [
+        "-27106",
+        "-776",
+        "-1278",
+        "-2167",
+        "-2515"
+      ]
+    },
+    {
+      "rule_id": "DQ-09",
+      "title": "Esquema estrito",
+      "description": "Todas as colunas do contrato presentes e nenhuma coluna extra (ex.: PII).",
+      "columns": [
+        "cpf"
+      ],
+      "n_failures": 1,
+      "examples": []
+    }
+  ],
+  "warnings": []
+}
