@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Bumps de versao maior exigem revisao manual: so minor/patch automaticos.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies, ci]
+    commit-message:
+      prefix: "ci"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    labels: [dependencies]
+    commit-message:
+      prefix: "build"
+    groups:
+      modeling:
+        patterns: ["pandas", "numpy", "scipy", "pyarrow", "scikit-learn", "xgboost", "joblib"]
+      quality-and-monitoring:
+        patterns: ["pandera*", "evidently", "mlflow", "prometheus-client"]
+      dev:
+        patterns: ["pytest*", "ruff", "pre-commit"]

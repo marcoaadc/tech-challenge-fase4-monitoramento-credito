@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "2.3.3"
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+
+# Actions fixadas por SHA (supply chain); o comentario indica a tag correspondente.
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Instalar Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: poetry
+      - name: Instalar dependencias
+        run: poetry install --no-interaction
+      - name: Ruff check
+        run: poetry run ruff check .
+      - name: Ruff format (verificacao)
+        run: poetry run ruff format --check .
+
+  test:
+    name: Testes (pytest, Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Instalar Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
+      - name: Instalar dependencias
+        run: poetry install --no-interaction
+      - name: Pytest com cobertura (inclui Evidently e MLflow reais)
+        run: poetry run pytest -q --cov --cov-report=term --cov-report=xml --cov-fail-under=90
+      - name: Publicar relatorio de cobertura
+        if: matrix.python-version == '3.10'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+  pipeline:
+    name: Pipeline completo (do download ao dashboard)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [lint, test]
+    env:
+      # Diretorios limpos: o dataset e baixado da UCI e o hash e conferido, como em um ambiente novo.
+      CREDITWATCH_DATA_DIR: ci-run/data
+      CREDITWATCH_MODELS_DIR: ci-run/models
+      CREDITWATCH_REPORTS_DIR: ci-run/reports
+      CREDITWATCH_LOGS_DIR: ci-run/logs
+      CREDITWATCH_MLFLOW_TRACKING_URI: sqlite:///ci-run/mlflow.db
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Instalar Poetry
+        run: pipx install poetry==${{ env.POETRY_VERSION }}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: poetry
+      - name: Instalar dependencias
+        run: poetry install --no-interaction
+      - name: ingest -> train -> simulate -> monitor -> analyze -> dashboard
+        run: |
+          mkdir -p ci-run
+          poetry run python -m creditwatch.pipelines.run_all
+      - name: O contrato bloqueia o lote corrompido (codigo de saida 1)
+        run: |
+          if poetry run python -m creditwatch.pipelines.validate ci-run/data/production/batch_2025-07_remessa1_corrompida.parquet; then
+            echo "::error::o lote corrompido deveria ter sido bloqueado"
+            exit 1
+          fi
+      - name: O contrato aceita um lote valido (codigo de saida 0)
+        run: poetry run python -m creditwatch.pipelines.validate ci-run/data/production/batch_2025-01.parquet
+      - name: O monitoramento detectou o drift e a degradacao
+        run: |
+          poetry run python - <<'PY'
+          import json
+
+          overview = json.load(open("ci-run/reports/monitoring/summary.json", encoding="utf-8"))
+          assert overview["blocked"] == 1, overview["blocked"]
+          assert overview["first_drift_alert"] == "2025-04", overview["first_drift_alert"]
+          assert overview["first_performance_alert"] == "2025-09", overview["first_performance_alert"]
+          assert overview["pipeline"]["failed"] == 0, overview["pipeline"]
+          assert len(overview["evidently_reports"]) == 3, overview["evidently_reports"]
+          print("monitoramento ok:", overview["alerts"])
+          PY
+      - name: Publicar relatorios (dashboard, Evidently, alertas, metricas)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: monitoring-reports
+          path: ci-run/reports/
