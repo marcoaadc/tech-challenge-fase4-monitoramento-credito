@@ -88,7 +88,7 @@ class StageTracker:
     def _record(self, event: StageEvent) -> None:
         self.events.append(event)
         if self.events_path:
-            with self.events_path.open("a", encoding="utf-8") as handle:
+            with self.events_path.open("a", encoding="utf-8", newline="\n") as handle:
                 handle.write(json.dumps(event.as_dict(), ensure_ascii=False, default=str) + "\n")
         if self.metrics is not None:
             self.metrics.observe_stage(event)

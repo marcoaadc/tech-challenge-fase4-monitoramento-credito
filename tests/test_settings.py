@@ -57,6 +57,7 @@ def test_json_helpers_write_valid_json_for_nan_and_numpy(tmp_path):
     payload = {"auc": float("nan"), "n": np.int64(3), "rate": np.float64(0.25), "items": (1, float("inf")), 1: "x"}
     path = write_json(tmp_path / "nested" / "report.json", payload)
     assert "NaN" not in path.read_text(encoding="utf-8")
+    assert b"\r\n" not in path.read_bytes()  # mesma saida em qualquer sistema operacional
     assert read_json(path) == {"auc": None, "n": 3, "rate": 0.25, "items": [1, None], "1": "x"}
 
 

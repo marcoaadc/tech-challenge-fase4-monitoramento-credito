@@ -42,7 +42,9 @@ def _json_safe(value: Any) -> Any:
 def write_json(path: Path, payload: dict | list) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(_json_safe(payload), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    # newline="\n": os relatorios saem identicos byte a byte em qualquer sistema operacional.
+    text = json.dumps(_json_safe(payload), indent=2, ensure_ascii=False) + "\n"
+    path.write_text(text, encoding="utf-8", newline="\n")
     return path
 
 

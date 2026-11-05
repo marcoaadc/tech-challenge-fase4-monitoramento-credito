@@ -45,7 +45,8 @@ class ModelMetadata:
 
     def save(self, directory: Path) -> Path:
         path = Path(directory) / METADATA_FILENAME
-        path.write_text(json.dumps(asdict(self), indent=2, ensure_ascii=False), encoding="utf-8")
+        payload = json.dumps(asdict(self), indent=2, ensure_ascii=False) + "\n"
+        path.write_text(payload, encoding="utf-8", newline="\n")
         return path
 
     @classmethod

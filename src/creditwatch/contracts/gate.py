@@ -151,7 +151,8 @@ def validate_batch(frame: pd.DataFrame, contract: pa.DataFrameSchema, batch: str
 def write_validation_report(result: ContractResult, path: Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(result.as_dict(), indent=2, ensure_ascii=False), encoding="utf-8")
+    payload = json.dumps(result.as_dict(), indent=2, ensure_ascii=False) + "\n"
+    path.write_text(payload, encoding="utf-8", newline="\n")
     return path
 
 
