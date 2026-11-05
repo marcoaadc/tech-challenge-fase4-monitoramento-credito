@@ -1,0 +1,96 @@
+{
+  "model_version": "20261105-81a0ccd0",
+  "selected": "xgboost",
+  "threshold": 0.289404,
+  "candidates": [
+    {
+      "name": "logreg",
+      "fit_seconds": 0.05,
+      "validation": {
+        "n": 2996,
+        "roc_auc": 0.76043,
+        "gini": 0.52086,
+        "ks": 0.40009,
+        "pr_auc": 0.499,
+        "brier": 0.14293,
+        "precision": 0.43646,
+        "recall": 0.63198,
+        "f1": 0.51633,
+        "default_rate": 0.2213,
+        "mean_score": 0.22264,
+        "calibration_gap": -0.00135,
+        "approval_rate": 0.67957,
+        "bad_rate_approved": 0.11984
+      }
+    },
+    {
+      "name": "xgboost",
+      "fit_seconds": 0.69,
+      "validation": {
+        "n": 2996,
+        "roc_auc": 0.77353,
+        "gini": 0.54707,
+        "ks": 0.42315,
+        "pr_auc": 0.54421,
+        "brier": 0.13745,
+        "precision": 0.51691,
+        "recall": 0.57617,
+        "f1": 0.54494,
+        "default_rate": 0.2213,
+        "mean_score": 0.22061,
+        "calibration_gap": 0.00068,
+        "approval_rate": 0.75334,
+        "bad_rate_approved": 0.1245
+      }
+    }
+  ],
+  "test": {
+    "n": 2997,
+    "roc_auc": 0.78001,
+    "gini": 0.56002,
+    "ks": 0.44512,
+    "pr_auc": 0.56178,
+    "brier": 0.13487,
+    "precision": 0.51499,
+    "recall": 0.59578,
+    "f1": 0.55245,
+    "default_rate": 0.22122,
+    "mean_score": 0.22647,
+    "calibration_gap": -0.00524,
+    "approval_rate": 0.74408,
+    "bad_rate_approved": 0.12018
+  },
+  "feature_importance": {
+    "max_delay": 0.26508,
+    "pay_status_1": 0.19007,
+    "months_delayed": 0.1665,
+    "pay_status_2": 0.03092,
+    "pay_status_3": 0.02265,
+    "pay_amt_1": 0.01902,
+    "utilization_avg": 0.01893,
+    "pay_amt_4": 0.0186,
+    "pay_amt_2": 0.01805,
+    "utilization_1": 0.01772,
+    "bill_amt_1": 0.01761,
+    "limit_bal": 0.01704,
+    "pay_amt_3": 0.01652,
+    "bill_amt_3": 0.01565,
+    "payment_ratio_1": 0.01553,
+    "bill_amt_5": 0.01532,
+    "bill_trend": 0.0144,
+    "pay_amt_6": 0.01431,
+    "bill_amt_2": 0.01403,
+    "payment_ratio_avg": 0.01397,
+    "bill_amt_4": 0.01358,
+    "pay_status_4": 0.01357,
+    "pay_status_5": 0.01345,
+    "bill_amt_6": 0.01265,
+    "pay_amt_5": 0.01251,
+    "pay_status_6": 0.0123
+  },
+  "splits": {
+    "train": 8989,
+    "val": 2996,
+    "test": 2997
+  }
+}
