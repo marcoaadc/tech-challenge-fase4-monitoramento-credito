@@ -1,0 +1,246 @@
+{
+  "seed": 42,
+  "batch_size": 2000,
+  "label_lag_months": 2,
+  "deliveries": [
+    {
+      "delivery": "2025-01",
+      "month": "2025-01",
+      "phase": "estavel",
+      "batch_file": "batch_2025-01.parquet",
+      "labels_file": "labels_2025-01.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-01",
+        "phase": "estavel",
+        "inflation": 0.0,
+        "stress": 0.0,
+        "new_profiles": 0.0,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-02",
+      "month": "2025-02",
+      "phase": "estavel",
+      "batch_file": "batch_2025-02.parquet",
+      "labels_file": "labels_2025-02.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-02",
+        "phase": "estavel",
+        "inflation": 0.0,
+        "stress": 0.0,
+        "new_profiles": 0.0,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-03",
+      "month": "2025-03",
+      "phase": "estavel",
+      "batch_file": "batch_2025-03.parquet",
+      "labels_file": "labels_2025-03.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-03",
+        "phase": "estavel",
+        "inflation": 0.0,
+        "stress": 0.0,
+        "new_profiles": 0.0,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-04",
+      "month": "2025-04",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-04.parquet",
+      "labels_file": "labels_2025-04.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-04",
+        "phase": "drift_de_dados",
+        "inflation": 0.1,
+        "stress": 0.1,
+        "new_profiles": 0.0,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-05",
+      "month": "2025-05",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-05.parquet",
+      "labels_file": "labels_2025-05.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-05",
+        "phase": "drift_de_dados",
+        "inflation": 0.2,
+        "stress": 0.2,
+        "new_profiles": 0.0,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-06",
+      "month": "2025-06",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-06.parquet",
+      "labels_file": "labels_2025-06.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-06",
+        "phase": "drift_de_dados",
+        "inflation": 0.3,
+        "stress": 0.3,
+        "new_profiles": 0.25,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-07-r1",
+      "month": "2025-07",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-07_remessa1_corrompida.parquet",
+      "labels_file": null,
+      "rows": 2040,
+      "note": "remessa corrompida pelo sistema de origem",
+      "injected_defects": [
+        "null_limits",
+        "invalid_ages",
+        "limits_above_policy",
+        "duplicated_customers",
+        "unknown_categories",
+        "negative_payments",
+        "leaked_pii_column"
+      ],
+      "expected_rules": [
+        "DQ-01",
+        "DQ-02",
+        "DQ-03",
+        "DQ-04",
+        "DQ-05",
+        "DQ-07",
+        "DQ-09"
+      ],
+      "plan": {
+        "month": "2025-07",
+        "phase": "drift_de_dados",
+        "inflation": 0.4,
+        "stress": 0.4,
+        "new_profiles": 0.5,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-07-r2",
+      "month": "2025-07",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-07.parquet",
+      "labels_file": "labels_2025-07.parquet",
+      "rows": 2000,
+      "note": "reenvio corrigido",
+      "plan": {
+        "month": "2025-07",
+        "phase": "drift_de_dados",
+        "inflation": 0.4,
+        "stress": 0.4,
+        "new_profiles": 0.5,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-08",
+      "month": "2025-08",
+      "phase": "drift_de_dados",
+      "batch_file": "batch_2025-08.parquet",
+      "labels_file": "labels_2025-08.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-08",
+        "phase": "drift_de_dados",
+        "inflation": 0.5,
+        "stress": 0.5,
+        "new_profiles": 0.75,
+        "concept": 0.0
+      }
+    },
+    {
+      "delivery": "2025-09",
+      "month": "2025-09",
+      "phase": "drift_de_conceito",
+      "batch_file": "batch_2025-09.parquet",
+      "labels_file": "labels_2025-09.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-09",
+        "phase": "drift_de_conceito",
+        "inflation": 0.55,
+        "stress": 0.5,
+        "new_profiles": 0.75,
+        "concept": 0.25
+      }
+    },
+    {
+      "delivery": "2025-10",
+      "month": "2025-10",
+      "phase": "drift_de_conceito",
+      "batch_file": "batch_2025-10.parquet",
+      "labels_file": "labels_2025-10.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-10",
+        "phase": "drift_de_conceito",
+        "inflation": 0.6,
+        "stress": 0.5,
+        "new_profiles": 0.75,
+        "concept": 0.5
+      }
+    },
+    {
+      "delivery": "2025-11",
+      "month": "2025-11",
+      "phase": "drift_de_conceito",
+      "batch_file": "batch_2025-11.parquet",
+      "labels_file": "labels_2025-11.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-11",
+        "phase": "drift_de_conceito",
+        "inflation": 0.65,
+        "stress": 0.5,
+        "new_profiles": 0.75,
+        "concept": 0.75
+      }
+    },
+    {
+      "delivery": "2025-12",
+      "month": "2025-12",
+      "phase": "drift_de_conceito",
+      "batch_file": "batch_2025-12.parquet",
+      "labels_file": "labels_2025-12.parquet",
+      "rows": 2000,
+      "note": "",
+      "plan": {
+        "month": "2025-12",
+        "phase": "drift_de_conceito",
+        "inflation": 0.7,
+        "stress": 0.5,
+        "new_profiles": 0.75,
+        "concept": 1.0
+      }
+    }
+  ]
+}
