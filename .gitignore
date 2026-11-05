@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+.ipynb_checkpoints/
+
+# Ambiente
+.env
+
+# MLflow (rastreamento local)
+mlflow.db
+mlruns/
+mlartifacts/
+
+# Logs de execucao (os eventos e alertas consolidados ficam em reports/observability)
+logs/
+
+# Dados derivados: recriados por `make pipeline`
+data/interim/
+data/predictions/
+# Quarentena: lotes reprovados podem conter dados pessoais e nunca vao para o repositorio
+data/quarantine/
+
+# Relatorios do Evidently fora dos checkpoints (gerados com --evidently all)
+reports/evidently/*.html
+!reports/evidently/drift_2025-03.html
+!reports/evidently/drift_2025-08.html
+!reports/evidently/drift_2025-12.html
+reports/data_quality/validation_*.json
+
+# Execucao do CI
+ci-run/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
