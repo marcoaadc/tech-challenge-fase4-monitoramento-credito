@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>creditwatch · Monitoramento do modelo de crédito</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,.10);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --seq-0: #eef1f4; --seq-1: #b7d3f6; --seq-2: #6da7ec; --seq-3: #256abf; --seq-4: #0d366b;
+  --neg: #e34948; --pos: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --seq-0: #262625; --seq-1: #104281; --seq-2: #256abf; --seq-3: #5598e7; --seq-4: #b7d3f6;
+    --neg: #e66767; --pos: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,.10);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --seq-0: #262625; --seq-1: #104281; --seq-2: #256abf; --seq-3: #5598e7; --seq-4: #b7d3f6;
+  --neg: #e66767; --pos: #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 22px; margin: 0 0 4px; font-weight: 650; }
+h2 { font-size: 16px; margin: 40px 0 4px; font-weight: 650; }
+h3 { font-size: 14px; margin: 0; font-weight: 600; }
+p { margin: 0; }
+.lede, .note { color: var(--ink-2); }
+.note { font-size: 13px; margin-bottom: 12px; max-width: 86ch; }
+code { font: 12.5px ui-monospace, "Cascadia Mono", Consolas, monospace; }
+a { color: inherit; text-underline-offset: 2px; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 20px; color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+.banner { display: flex; gap: 12px; align-items: flex-start; margin-top: 16px; padding: 12px 16px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.banner strong { display: block; }
+.grid { display: grid; gap: 12px; }
+.tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-top: 16px; }
+.cols-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+.tile .label { color: var(--ink-2); font-size: 12.5px; }
+.tile .value { font-size: 26px; font-weight: 650; line-height: 1.2; margin-top: 2px; }
+.tile .delta { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.card > .sub { color: var(--ink-2); font-size: 12.5px; margin: 2px 0 10px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart svg:focus-visible { outline: 2px solid var(--s1); outline-offset: 4px; border-radius: 4px; }
+.chart text { font: 11.5px system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart text.strong { fill: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin-bottom: 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key-line { width: 14px; height: 2px; border-radius: 1px; }
+.key-box { width: 10px; height: 10px; border-radius: 2px; }
+.tooltip { position: absolute; pointer-events: none; z-index: 5; min-width: 150px; max-width: 280px; padding: 8px 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.14); opacity: 0; transition: opacity .08s; }
+.tooltip.on { opacity: 1; }
+.tooltip .t-head { color: var(--ink-2); margin-bottom: 4px; }
+.tooltip .t-row { display: flex; align-items: center; gap: 6px; }
+.tooltip .t-row b { font-weight: 650; }
+.tooltip .t-row span.n { color: var(--ink-2); }
+details { margin-top: 8px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 12.5px; width: fit-content; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--ink-2); font-weight: 600; white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.status { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.dot.ok { background: var(--good); } .dot.warning { background: var(--warning); border-radius: 2px; }
+.dot.critical { background: var(--critical); transform: rotate(45deg); border-radius: 1px; }
+.dot.blocked { background: var(--serious); border-radius: 1px; }
+.filters { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; font-size: 13px; color: var(--ink-2); }
+select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 6px; padding: 4px 8px; }
+.scale { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--ink-2); margin-bottom: 8px; }
+.scale span { display: inline-flex; align-items: center; gap: 6px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.links a { padding: 6px 12px; border: 1px solid var(--axis); border-radius: 6px; text-decoration: none; font-size: 13px; }
+.links a:hover { background: var(--page); }
+footer { color: var(--muted); font-size: 12.5px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Monitoramento do modelo de crédito</h1>
+    <p class="lede">Qualidade de dados, drift, saúde do modelo e do pipeline nas remessas de produção, comparadas ao Dataset de Referência.</p>
+    <div class="meta" id="meta"></div>
+    <div class="banner" id="banner"></div>
+  </header>
+
+  <section class="grid tiles" id="tiles" aria-label="Indicadores principais"></section>
+
+  <h2 id="saude">Saúde do modelo</h2>
+  <p class="note">Métricas que dependem do rótulo só ficam disponíveis após a maturação da safra; os pontos mostram o mês da remessa, não o mês em que o número passou a ser conhecido.</p>
+  <div class="grid cols-2">
+    <article class="card"><h3>Poder de discriminação (ROC AUC)</h3><p class="sub" id="auc-sub"></p><div class="chart" id="chart-auc"></div></article>
+    <article class="card"><h3>Inadimplência observada × prevista</h3><p class="sub">A distância entre observada e prevista é o erro de calibração; a inadimplência entre aprovados é a perda que chega à carteira.</p><div class="chart" id="chart-default"></div></article>
+  </div>
+
+  <h2 id="drift">Drift dos dados de entrada</h2>
+  <p class="note" id="drift-note"></p>
+  <div class="grid cols-2">
+    <article class="card"><h3>Features com drift por mês</h3><p class="sub" id="drifted-sub"></p><div class="chart" id="chart-drifted"></div></article>
+    <article class="card"><h3>PSI das features mais afetadas</h3><p class="sub" id="psi-sub"></p><div class="chart" id="chart-psi"></div></article>
+  </div>
+  <article class="card" style="margin-top:12px"><h3>Mapa de PSI por feature e mês</h3><p class="sub">Cada célula compara a remessa do mês com a referência. Passe o cursor para ver o teste estatístico.</p><div class="scale" id="heat-scale"></div><div class="chart" id="chart-heat"></div></article>
+
+  <h2 id="detalhe">Detalhe do mês</h2>
+  <div class="filters"><label for="month">Mês em análise</label><select id="month"></select><span id="month-status"></span></div>
+  <div class="grid cols-2">
+    <article class="card"><h3>Testes estatísticos por feature</h3><p class="sub">PSI (tamanho do efeito) com Kolmogorov-Smirnov nas numéricas e qui-quadrado nas categóricas.</p><div class="table-wrap" id="feature-table"></div></article>
+    <article class="card"><h3>Alertas do mês</h3><p class="sub" id="alerts-sub"></p><div class="table-wrap" id="month-alerts"></div><div class="links" id="month-links"></div></article>
+  </div>
+
+  <h2 id="pipeline">Saúde do pipeline e contrato de dados</h2>
+  <p class="note">Cada remessa passa pelos estágios leitura, contrato, escoragem, drift e performance. Uma remessa reprovada no contrato é bloqueada antes da escoragem e vai para a quarentena.</p>
+  <div class="grid cols-2">
+    <article class="card"><h3>Remessas processadas</h3><p class="sub" id="deliveries-sub"></p><div class="table-wrap" id="deliveries"></div></article>
+    <article class="card"><h3>Estágios do pipeline</h3><p class="sub">Execuções, resultado e duração por estágio na última execução.</p><div class="table-wrap" id="stages"></div><h3 style="margin-top:20px">Regras violadas na remessa bloqueada</h3><p class="sub" id="violations-sub"></p><div class="table-wrap" id="violations"></div></article>
+  </div>
+
+  <section id="analysis-section">
+    <h2 id="causa">Causa da degradação</h2>
+    <p class="note">Cada mecanismo do cenário foi ligado e desligado isoladamente; a variação de AUC é repartida entre eles por valores de Shapley. Barras à esquerda derrubam o modelo.</p>
+    <div class="grid cols-2">
+      <article class="card"><h3>Contribuição de cada mecanismo para a variação do ROC AUC</h3><p class="sub" id="causal-sub"></p><div class="chart" id="chart-causal"></div></article>
+      <article class="card"><h3>Inadimplência observada × prevista por segmento</h3><p class="sub">Um segmento em que a observada descola da prevista é a assinatura de drift de conceito.</p><div class="table-wrap" id="segments"></div></article>
+    </div>
+    <div class="grid cols-2" style="margin-top:12px">
+      <article class="card"><h3>Remediação testada em meses posteriores</h3><p class="sub" id="remediation-sub"></p><div class="table-wrap" id="remediation"></div></article>
+      <article class="card"><h3>Auditoria de viés</h3><p class="sub">Grupo menos aprovado de cada atributo protegido. Impacto desigual abaixo de 0,80 indica impacto adverso (regra dos quatro quintos).</p><div class="table-wrap" id="fairness"></div></article>
+    </div>
+  </section>
+
+  <h2 id="alertas">Todos os alertas</h2>
+  <article class="card"><div class="table-wrap" id="all-alerts"></div></article>
+
+  <footer id="footer"></footer>
+</main>
+
+<script type="application/json" id="payload">{{ payload | tojson }}</script>
+{% raw %}
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("payload").textContent);
+const NS = "http://www.w3.org/2000/svg";
+const nf = (digits) => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const F = {
+  int: (v) => v == null ? "–" : nf(0).format(v),
+  d1: (v) => v == null ? "–" : nf(1).format(v),
+  d2: (v) => v == null ? "–" : nf(2).format(v),
+  d3: (v) => v == null ? "–" : nf(3).format(v),
+  pct: (v) => v == null ? "–" : nf(1).format(v * 100) + "%",
+  signed3: (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + nf(3).format(Math.abs(v)),
+  p: (v) => v == null ? "–" : v < 0.001 ? "< 0,001" : nf(3).format(v),
+};
+const monthLabel = (m) => { const [y, n] = m.split("-"); return ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+n - 1] + "/" + y.slice(2); };
+const SEVERITY = { ok: "Estável", warning: "Atenção", critical: "Crítico" };
+const KIND = { data_quality: "Qualidade de dados", data_drift: "Drift de dados", prediction_drift: "Drift de predição",
+  target_drift: "Drift do alvo", performance: "Performance", calibration: "Calibração" };
+
+function el(tag, attrs, parent, text) {
+  const node = document.createElement(tag);
+  for (const key in attrs || {}) node.setAttribute(key, attrs[key]);
+  if (text != null) node.textContent = text;
+  if (parent) parent.appendChild(node);
+  return node;
+}
+function sv(tag, attrs, parent, text) {
+  const node = document.createElementNS(NS, tag);
+  for (const key in attrs || {}) node.setAttribute(key, attrs[key]);
+  if (text != null) node.textContent = text;
+  if (parent) parent.appendChild(node);
+  return node;
+}
+function status(parent, kind, label) {
+  const wrap = el("span", { class: "status" }, parent);
+  el("span", { class: "dot " + kind, "aria-hidden": "true" }, wrap);
+  el("span", {}, wrap, label);
+  return wrap;
+}
+function table(parent, columns, rows) {
+  parent.replaceChildren();
+  const t = el("table", {}, parent);
+  const head = el("tr", {}, el("thead", {}, t));
+  columns.forEach((c) => el("th", { scope: "col", class: c.num ? "num" : "" }, head, c.label));
+  const body = el("tbody", {}, t);
+  rows.forEach((row) => {
+    const tr = el("tr", {}, body);
+    columns.forEach((c) => {
+      const td = el("td", { class: c.num ? "num" : "" }, tr);
+      const value = c.value(row);
+      if (value instanceof Node) td.appendChild(value); else td.textContent = value;
+    });
+  });
+  return t;
+}
+function tableView(parent, columns, rows) {
+  const details = el("details", {}, parent);
+  el("summary", {}, details, "Ver tabela");
+  table(el("div", { class: "table-wrap" }, details), columns, rows);
+}
+function niceTicks(min, max, count) {
+  const span = max - min || 1;
+  const raw = span / count;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw);
+  const ticks = [];
+  for (let v = Math.ceil(min / step) * step; v <= max + step * 1e-6; v += step) ticks.push(+v.toFixed(10));
+  return ticks;
+}
+function tooltip(container) {
+  const tip = el("div", { class: "tooltip", role: "status" }, container);
+  return {
+    show(x, y, head, rows) {
+      tip.replaceChildren();
+      el("div", { class: "t-head" }, tip, head);
+      rows.forEach((r) => {
+        const line = el("div", { class: "t-row" }, tip);
+        if (r.color) el("span", { class: "key-line", style: "background:" + r.color }, line);
+        el("b", {}, line, r.value);
+        el("span", { class: "n" }, line, r.name);
+      });
+      tip.classList.add("on");
+      const box = container.getBoundingClientRect();
+      const width = tip.offsetWidth;
+      tip.style.left = Math.max(0, Math.min(x + 12, box.width - width)) + "px";
+      tip.style.top = Math.max(0, y - tip.offsetHeight - 8) + "px";
+    },
+    hide() { tip.classList.remove("on"); },
+  };
+}
+function legend(parent, series, box) {
+  const wrap = el("div", { class: "legend" }, parent);
+  series.forEach((s) => {
+    const item = el("span", {}, wrap);
+    el("span", { class: box ? "key-box" : "key-line", style: "background:" + s.color }, item);
+    el("span", {}, item, s.name);
+  });
+}
+
+/* Moldura comum: eixos, grade, faixas de fase e posicao dos meses. */
+function frame(container, cfg) {
+  const width = Math.max(300, container.clientWidth);
+  const height = cfg.height || 250;
+  const m = { top: 24, right: 14, bottom: 26, left: 46 };
+  const svg = sv("svg", { viewBox: `0 0 ${width} ${height}`, height: height, role: "img", tabindex: "0", "aria-label": cfg.label }, container);
+  const plotW = width - m.left - m.right, plotH = height - m.top - m.bottom;
+  const n = D.months.length, step = plotW / n;
+  const x = (i) => m.left + (i + 0.5) * step;
+  const ticks = niceTicks(cfg.yMin, cfg.yMax, 4);
+  const lo = Math.min(cfg.yMin, ticks[0]), hi = Math.max(cfg.yMax, ticks[ticks.length - 1]);
+  const y = (v) => m.top + plotH - ((v - lo) / (hi - lo)) * plotH;
+  ticks.forEach((t) => {
+    sv("line", { x1: m.left, x2: width - m.right, y1: y(t), y2: y(t), stroke: "var(--grid)", "stroke-width": 1 }, svg);
+    sv("text", { x: m.left - 8, y: y(t) + 4, "text-anchor": "end" }, svg, cfg.fmt(t));
+  });
+  sv("line", { x1: m.left, x2: width - m.right, y1: y(lo), y2: y(lo), stroke: "var(--axis)", "stroke-width": 1 }, svg);
+  D.phases.forEach((phase, index) => {
+    const start = m.left + phase.start * step, end = m.left + (phase.end + 1) * step;
+    if (index > 0) sv("line", { x1: start, x2: start, y1: m.top - 14, y2: m.top + plotH, stroke: "var(--axis)", "stroke-width": 1 }, svg);
+    sv("text", { x: start + 4, y: m.top - 8 }, svg, end - start > 80 ? phase.label : "");
+  });
+  const every = step < 44 ? 2 : 1;
+  D.months.forEach((month, i) => {
+    if (i % every === 0) sv("text", { x: x(i), y: height - 8, "text-anchor": "middle" }, svg, monthLabel(month));
+  });
+  (cfg.refs || []).forEach((ref) => {
+    sv("line", { x1: m.left, x2: width - m.right, y1: y(ref.value), y2: y(ref.value), stroke: "var(--muted)", "stroke-width": 1 }, svg);
+    sv("text", { x: width - m.right, y: y(ref.value) - 5, "text-anchor": "end", class: "strong" }, svg, ref.label);
+  });
+  return { svg, x, y, m, width, height, plotW, plotH, step, n, lo };
+}
+function hover(container, f, onIndex) {
+  const tip = tooltip(container);
+  const cross = sv("line", { y1: f.m.top, y2: f.m.top + f.plotH, stroke: "var(--muted)", "stroke-width": 1, visibility: "hidden" }, f.svg);
+  const hit = sv("rect", { x: f.m.left, y: f.m.top, width: f.plotW, height: f.plotH, fill: "transparent" }, f.svg);
+  let current = -1;
+  const at = (i) => {
+    current = Math.max(0, Math.min(f.n - 1, i));
+    cross.setAttribute("x1", f.x(current)); cross.setAttribute("x2", f.x(current)); cross.setAttribute("visibility", "visible");
+    const info = onIndex(current);
+    tip.show(f.x(current) * (container.clientWidth / f.width), f.m.top + 20, info.head, info.rows);
+  };
+  const off = () => { cross.setAttribute("visibility", "hidden"); tip.hide(); current = -1; };
+  hit.addEventListener("pointermove", (ev) => {
+    const box = f.svg.getBoundingClientRect();
+    at(Math.floor(((ev.clientX - box.left) * (f.width / box.width) - f.m.left) / f.step));
+  });
+  hit.addEventListener("pointerleave", off);
+  f.svg.addEventListener("keydown", (ev) => {
+    if (ev.key === "ArrowRight") { at(current + 1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { at(current < 0 ? f.n - 1 : current - 1); ev.preventDefault(); }
+    else if (ev.key === "Escape") off();
+  });
+  f.svg.addEventListener("blur", off);
+}
+function phaseOf(i) { return D.phases.find((p) => i >= p.start && i <= p.end).label; }
+
+function lineChart(id, cfg) {
+  const container = document.getElementById(id);
+  container.replaceChildren();
+  if (cfg.series.length > 1) legend(container, cfg.series, false);
+  const values = cfg.series.flatMap((s) => s.values).filter((v) => v != null).concat((cfg.refs || []).map((r) => r.value));
+  const f = frame(container, Object.assign({ yMin: cfg.yMin ?? Math.min(...values), yMax: cfg.yMax ?? Math.max(...values) }, cfg));
+  cfg.series.forEach((s) => {
+    const points = s.values.map((v, i) => (v == null ? null : [f.x(i), f.y(v)])).filter(Boolean);
+    sv("path", { d: "M" + points.map((p) => p.join(",")).join("L"), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, f.svg);
+    const last = points[points.length - 1];
+    sv("circle", { cx: last[0], cy: last[1], r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2 }, f.svg);
+    if (cfg.series.length === 1) {
+      // Rotulo do ultimo ponto do lado livre da linha: abaixo se ela vem descendo, acima se vem subindo.
+      const falling = points.length > 1 && last[1] > points[points.length - 2][1];
+      sv("text", { x: last[0] - 6, y: last[1] + (falling ? 18 : -10), "text-anchor": "end", class: "strong" }, f.svg, cfg.fmt(s.values[s.values.length - 1]));
+    }
+  });
+  hover(container, f, (i) => ({
+    head: monthLabel(D.months[i]) + " · " + phaseOf(i),
+    rows: cfg.series.map((s) => ({ color: s.color, value: cfg.fmt(s.values[i]), name: s.name })),
+  }));
+  tableView(container, [{ label: "Mês", value: (r) => monthLabel(D.months[r]) }].concat(
+    cfg.series.map((s) => ({ label: s.name, num: true, value: (r) => cfg.fmt(s.values[r]) }))), D.months.map((_, i) => i));
+}
+function stackedColumns(id, cfg) {
+  const container = document.getElementById(id);
+  container.replaceChildren();
+  legend(container, cfg.series, true);
+  const totals = D.months.map((_, i) => cfg.series.reduce((sum, s) => sum + (s.values[i] || 0), 0));
+  const f = frame(container, Object.assign({}, cfg, { yMin: 0, yMax: Math.max(cfg.yMax || 0, ...totals) }));
+  const barW = Math.min(24, f.step * 0.62), base = f.y(0);
+  D.months.forEach((_, i) => {
+    let acc = 0;
+    cfg.series.forEach((s, k) => {
+      const value = s.values[i] || 0;
+      if (!value) return;
+      const top = f.y(acc + value), bottom = f.y(acc) - (acc > 0 ? 2 : 0);
+      const isTop = cfg.series.slice(k + 1).every((o) => !(o.values[i] || 0));
+      const h = Math.max(1, bottom - top), r = isTop ? Math.min(4, h) : 0, x0 = f.x(i) - barW / 2;
+      sv("path", { d: `M${x0},${bottom}V${top + r}q0,${-r} ${r},${-r}H${x0 + barW - r}q${r},0 ${r},${r}V${bottom}Z`, fill: s.color }, f.svg);
+      acc += value;
+    });
+    if (!totals[i]) sv("line", { x1: f.x(i) - barW / 2, x2: f.x(i) + barW / 2, y1: base, y2: base, stroke: "var(--axis)", "stroke-width": 2 }, f.svg);
+  });
+  hover(container, f, (i) => ({
+    head: monthLabel(D.months[i]) + " · " + phaseOf(i),
+    rows: cfg.series.map((s) => ({ color: s.color, value: cfg.fmt(s.values[i] || 0), name: s.name }))
+      .concat([{ value: cfg.fmt(totals[i]), name: "total de " + cfg.totalOf }]),
+  }));
+  tableView(container, [{ label: "Mês", value: (r) => monthLabel(D.months[r]) }].concat(
+    cfg.series.map((s) => ({ label: s.name, num: true, value: (r) => cfg.fmt(s.values[r] || 0) }))), D.months.map((_, i) => i));
+}
+const PSI_CLASSES = [
+  { max: D.thresholds.psi_warning, color: "var(--seq-0)", label: "estável (< " + F.d2(D.thresholds.psi_warning) + ")" },
+  { max: D.thresholds.psi_critical, color: "var(--seq-1)", label: "moderado (" + F.d2(D.thresholds.psi_warning) + " a " + F.d2(D.thresholds.psi_critical) + ")" },
+  { max: 0.5, color: "var(--seq-2)", label: "significativo (" + F.d2(D.thresholds.psi_critical) + " a 0,50)" },
+  { max: 1.0, color: "var(--seq-3)", label: "forte (0,50 a 1,00)" },
+  { max: Infinity, color: "var(--seq-4)", label: "extremo (≥ 1,00)" },
+];
+const psiClass = (v) => PSI_CLASSES.find((c) => v < c.max);
+function heatmap(id, features) {
+  const container = document.getElementById(id);
+  container.replaceChildren();
+  const width = Math.max(300, container.clientWidth);
+  const labelW = Math.min(150, width * 0.34), rowH = 22, top = 22, gap = 2;
+  const cellW = (width - labelW) / D.months.length;
+  const height = top + features.length * rowH + 4;
+  const svg = sv("svg", { viewBox: `0 0 ${width} ${height}`, height: height, role: "img", "aria-label": "Mapa de PSI por feature e mês" }, container);
+  const tip = tooltip(container);
+  const every = cellW < 44 ? 2 : 1;
+  D.months.forEach((month, i) => { if (i % every === 0) sv("text", { x: labelW + (i + 0.5) * cellW, y: 12, "text-anchor": "middle" }, svg, monthLabel(month)); });
+  features.forEach((name, r) => {
+    const y0 = top + r * rowH;
+    sv("text", { x: labelW - 8, y: y0 + rowH / 2 + 3, "text-anchor": "end", class: "strong" }, svg, name);
+    D.months.forEach((month, i) => {
+      const detail = D.features.detail[month].find((d) => d.feature === name);
+      const cell = sv("rect", { x: labelW + i * cellW + gap / 2, y: y0 + gap / 2, width: cellW - gap, height: rowH - gap, rx: 3, fill: psiClass(detail.psi).color, tabindex: "-1" }, svg);
+      const show = () => {
+        cell.setAttribute("stroke", "var(--ink)");
+        tip.show((labelW + (i + 0.5) * cellW) * (container.clientWidth / width), y0, name + " · " + monthLabel(month), [
+          { value: F.d3(detail.psi), name: "PSI (" + SEVERITY[detail.severity].toLowerCase() + ")" },
+          { value: F.d3(detail.statistic), name: detail.test === "ks" ? "D de Kolmogorov-Smirnov" : "V de Cramér (qui-quadrado)" },
+          { value: F.p(detail.p_value), name: "p-valor" },
+        ]);
+      };
+      cell.addEventListener("pointerenter", show);
+      cell.addEventListener("pointerleave", () => { cell.removeAttribute("stroke"); tip.hide(); });
+    });
+  });
+  tableView(container, [{ label: "Feature", value: (name) => name }].concat(
+    D.months.map((month, i) => ({ label: monthLabel(month), num: true, value: (name) => F.d2(D.features.psi[name][i]) }))), features);
+}
+function divergingBars(id, rows, fmt) {
+  const container = document.getElementById(id);
+  container.replaceChildren();
+  const width = Math.max(300, container.clientWidth);
+  const labelW = Math.min(170, width * 0.4), rowH = 34, top = 6, valueW = 56;
+  const height = top + rows.length * rowH + 22;
+  const svg = sv("svg", { viewBox: `0 0 ${width} ${height}`, height: height, role: "img", "aria-label": "Contribuição de cada mecanismo" }, container);
+  const extent = Math.max(...rows.map((r) => Math.abs(r.value))) || 1;
+  const x0 = labelW + valueW, x1 = width - valueW, zero = (x0 + x1) / 2, half = (x1 - x0) / 2;
+  const tip = tooltip(container);
+  rows.forEach((row, i) => {
+    const y0 = top + i * rowH, len = (Math.abs(row.value) / extent) * half, h = 16, cy = y0 + rowH / 2;
+    sv("text", { x: labelW, y: cy + 4, "text-anchor": "end", class: "strong" }, svg, row.label);
+    const neg = row.value < 0, r = Math.min(4, len);
+    const d = neg
+      ? `M${zero},${cy - h / 2}H${zero - len + r}q${-r},0 ${-r},${r}V${cy + h / 2 - r}q0,${r} ${r},${r}H${zero}Z`
+      : `M${zero},${cy - h / 2}H${zero + len - r}q${r},0 ${r},${r}V${cy + h / 2 - r}q0,${r} ${-r},${r}H${zero}Z`;
+    const bar = sv("path", { d: d, fill: neg ? "var(--neg)" : "var(--pos)" }, svg);
+    sv("text", { x: neg ? zero - len - 6 : zero + len + 6, y: cy + 4, "text-anchor": neg ? "end" : "start", class: "strong" }, svg, fmt(row.value));
+    const hit = sv("rect", { x: x0 - valueW, y: y0, width: x1 - x0 + 2 * valueW, height: rowH, fill: "transparent" }, svg);
+    hit.addEventListener("pointerenter", () => { bar.setAttribute("opacity", ".8"); tip.show(zero * (container.clientWidth / width), y0, row.label, row.tip); });
+    hit.addEventListener("pointerleave", () => { bar.removeAttribute("opacity"); tip.hide(); });
+  });
+  sv("line", { x1: zero, x2: zero, y1: top, y2: top + rows.length * rowH, stroke: "var(--axis)", "stroke-width": 1 }, svg);
+  sv("text", { x: zero, y: height - 6, "text-anchor": "middle" }, svg, "0");
+  sv("text", { x: x0, y: height - 6, "text-anchor": "start" }, svg, "← reduz o AUC");
+  sv("text", { x: x1, y: height - 6, "text-anchor": "end" }, svg, "aumenta o AUC →");
+}
+
+/* ---------- Conteudo ---------- */
+const T = D.timeline, last = D.months.length - 1, ref = D.reference, ov = D.overview;
+const stableEnd = D.phases[0].end;
+
+(function header() {
+  const meta = document.getElementById("meta");
+  [["Modelo", (D.model.type || "") + " · versão " + (D.model.version || "–")],
+   ["Período", monthLabel(D.months[0]) + " a " + monthLabel(D.months[last])],
+   ["Ponto de corte (PD)", F.d3(D.model.threshold)],
+   ["Gerado em", new Date(D.generated_at).toLocaleString("pt-BR")]].forEach(([k, v]) => {
+    const item = el("span", {}, meta); el("span", {}, item, k + ": "); el("b", {}, item, v);
+  });
+  const banner = document.getElementById("banner");
+  const drop = ref.roc_auc - T.roc_auc[last];
+  const level = drop >= D.thresholds.auc_drop_critical ? "critical" : ov.alerts.critical ? "warning" : "ok";
+  status(banner, level, "");
+  const text = el("div", {}, banner);
+  el("strong", {}, text, level === "critical" ? "Modelo degradado: ação necessária" : level === "warning" ? "Drift detectado: modelo em observação" : "Modelo estável");
+  el("span", { class: "lede" }, text,
+    "Primeiro alerta de drift de dados em " + (ov.first_drift_alert ? monthLabel(ov.first_drift_alert) : "–") +
+    "; primeira queda de performance em " + (ov.first_performance_alert ? monthLabel(ov.first_performance_alert) : "–") +
+    ". O ROC AUC foi de " + F.d3(ref.roc_auc) + " na referência para " + F.d3(T.roc_auc[last]) + " em " + monthLabel(D.months[last]) +
+    " e a inadimplência entre os aprovados, de " + F.pct(ref.bad_rate_approved) + " para " + F.pct(T.bad_rate_approved[last]) + ".");
+})();
+
+(function tiles() {
+  const lastDetail = D.features.detail[D.months[last]];
+  const tiles = [
+    ["ROC AUC no último mês", F.d3(T.roc_auc[last]), "referência " + F.d3(ref.roc_auc)],
+    ["Inadimplência entre aprovados", F.pct(T.bad_rate_approved[last]), "referência " + F.pct(ref.bad_rate_approved)],
+    ["Features com drift", F.int(T.n_drifted[last]) + " de " + lastDetail.length, F.int(T.n_critical[last]) + " críticas no último mês"],
+    ["Alertas no período", F.int(ov.alerts.total), F.int(ov.alerts.critical) + " críticos · " + F.int(ov.alerts.warning) + " de atenção"],
+    ["Remessas processadas", F.int(ov.deliveries), F.int(ov.blocked) + " bloqueada(s) pelo contrato"],
+    ["Propostas escoradas", F.int(ov.rows_scored), F.int(ov.rows_quarantined) + " em quarentena"],
+  ];
+  const parent = document.getElementById("tiles");
+  tiles.forEach(([label, value, delta]) => {
+    const card = el("div", { class: "card tile" }, parent);
+    el("div", { class: "label" }, card, label); el("div", { class: "value" }, card, value); el("div", { class: "delta" }, card, delta);
+  });
+})();
+
+function drawCharts() {
+  document.getElementById("auc-sub").textContent =
+    "Referência " + F.d3(ref.roc_auc) + "; alerta crítico a partir de uma queda de " + F.d2(D.thresholds.auc_drop_critical) + ".";
+  lineChart("chart-auc", {
+    label: "ROC AUC por mês", fmt: F.d2, yMin: 0.5, yMax: 0.85,
+    series: [{ name: "ROC AUC", color: "var(--s1)", values: T.roc_auc }],
+    refs: [{ value: ref.roc_auc - D.thresholds.auc_drop_critical, label: "limite de alerta crítico" }],
+  });
+  lineChart("chart-default", {
+    label: "Inadimplência observada, prevista e entre aprovados", fmt: F.pct, yMin: 0,
+    series: [
+      { name: "Inadimplência observada", color: "var(--s1)", values: T.default_rate },
+      { name: "PD média prevista", color: "var(--s2)", values: T.mean_score },
+      { name: "Inadimplência entre aprovados", color: "var(--s3)", values: T.bad_rate_approved },
+    ],
+  });
+  const total = D.features.detail[D.months[last]].length;
+  document.getElementById("drifted-sub").textContent =
+    "De " + total + " features monitoradas. Drift do dataset quando " + F.pct(D.thresholds.drift_share) + " ou mais delas mudam.";
+  stackedColumns("chart-drifted", {
+    label: "Features com drift por mês", fmt: F.int, totalOf: "features com drift", yMax: 8,
+    series: [
+      { name: "Atenção (PSI ≥ " + F.d2(D.thresholds.psi_warning) + ")", color: "var(--warning)", values: T.n_drifted.map((v, i) => v - T.n_critical[i]) },
+      { name: "Crítico (PSI ≥ " + F.d2(D.thresholds.psi_critical) + ")", color: "var(--critical)", values: T.n_critical },
+    ],
+  });
+  const ranked = D.features.names.slice().sort((a, b) => Math.max(...D.features.psi[b]) - Math.max(...D.features.psi[a]));
+  const colors = ["var(--s1)", "var(--s2)", "var(--s3)"];
+  document.getElementById("psi-sub").textContent = "As três features com maior PSI no período. Acima de " + F.d2(D.thresholds.psi_critical) + " a mudança é significativa.";
+  lineChart("chart-psi", {
+    label: "PSI das três features mais afetadas", fmt: F.d2, yMin: 0,
+    series: ranked.slice(0, 3).map((name, i) => ({ name: name, color: colors[i], values: D.features.psi[name] })),
+    refs: [{ value: D.thresholds.psi_critical, label: "PSI " + F.d2(D.thresholds.psi_critical) }],
+  });
+  heatmap("chart-heat", ranked.filter((name) => Math.max(...D.features.psi[name]) >= D.thresholds.psi_warning / 2));
+  if (D.analysis.causal) {
+    const c = D.analysis.causal;
+    document.getElementById("causal-sub").textContent =
+      "Efeito total no cenário de " + monthLabel(c.plan.month) + ": " + F.signed3(c.total_effect.roc_auc) + " de ROC AUC.";
+    divergingBars("chart-causal", c.mechanisms.map((name) => ({
+      label: c.mechanism_labels[name].split(" (")[0], value: c.shapley.roc_auc[name],
+      tip: [
+        { value: F.signed3(c.shapley.roc_auc[name]), name: "ROC AUC (Shapley)" },
+        { value: F.signed3(c.single[name].roc_auc), name: "ROC AUC com o mecanismo isolado" },
+        { value: F.signed3(c.shapley.bad_rate_approved[name]), name: "inadimplência entre aprovados" },
+        { value: F.d1(c.shapley.n_drifted[name]), name: "features com drift" },
+      ],
+    })), F.signed3);
+  }
+}
+
+(function heatScale() {
+  const parent = document.getElementById("heat-scale");
+  PSI_CLASSES.forEach((c) => { const item = el("span", {}, parent); el("span", { class: "key-box", style: "background:" + c.color }, item); el("span", {}, item, c.label); });
+  document.getElementById("drift-note").textContent =
+    "PSI contra a referência: abaixo de " + F.d2(D.thresholds.psi_warning) + " estável, até " + F.d2(D.thresholds.psi_critical) +
+    " mudança moderada, acima disso significativa. Os três primeiros meses são o controle: nenhum alarme falso.";
+})();
+
+function severityNode(level) { const span = document.createElement("span"); status(span, level, SEVERITY[level]); return span; }
+function alertColumns(withMonth) {
+  const columns = [
+    { label: "Severidade", value: (a) => severityNode(a.severity) },
+    { label: "Tipo", value: (a) => KIND[a.kind] || a.kind },
+    { label: "Alerta", value: (a) => a.title + ". " + a.detail },
+    { label: "Detectável em", value: (a) => /^\d{4}-\d{2}$/.test(a.detectable_at) ? monthLabel(a.detectable_at) : a.detectable_at },
+  ];
+  return withMonth ? [{ label: "Mês", value: (a) => monthLabel(a.batch) }].concat(columns) : columns;
+}
+function drawMonth(month) {
+  const detail = D.features.detail[month].slice().sort((a, b) => b.psi - a.psi);
+  table(document.getElementById("feature-table"), [
+    { label: "Feature", value: (f) => f.feature + (f.model_input ? "" : " (fora do modelo)") },
+    { label: "PSI", num: true, value: (f) => F.d3(f.psi) },
+    { label: "Teste", value: (f) => f.test === "ks" ? "KS" : "Qui²" },
+    { label: "Estatística", num: true, value: (f) => F.d3(f.statistic) },
+    { label: "p-valor", num: true, value: (f) => F.p(f.p_value) },
+    { label: "Média ref. → mês", num: true, value: (f) => F.d2(f.reference_mean) + " → " + F.d2(f.current_mean) },
+    { label: "Situação", value: (f) => severityNode(f.severity) },
+  ], detail);
+  const alerts = D.alerts.filter((a) => a.batch === month);
+  document.getElementById("alerts-sub").textContent = alerts.length ? alerts.length + " alerta(s) em " + monthLabel(month) + "." : "Nenhum alerta em " + monthLabel(month) + ".";
+  const holder = document.getElementById("month-alerts");
+  if (alerts.length) table(holder, alertColumns(false), alerts); else holder.replaceChildren();
+  const links = document.getElementById("month-links");
+  links.replaceChildren();
+  D.deliveries.filter((d) => d.month === month && d.evidently).forEach((d) => {
+    el("a", { href: "../" + d.evidently }, links, "Abrir relatório do Evidently de " + monthLabel(month));
+  });
+  const i = D.months.indexOf(month), sts = document.getElementById("month-status");
+  sts.replaceChildren();
+  status(sts, T.n_critical[i] > 0 || T.alerts_critical[i] > 0 ? "critical" : T.n_drifted[i] > 0 ? "warning" : "ok", phaseOf(i) + " · " + F.int(T.n_drifted[i]) + " features com drift");
+}
+
+(function monthFilter() {
+  const select = document.getElementById("month");
+  D.months.forEach((month) => el("option", { value: month }, select, monthLabel(month)));
+  select.value = D.months[last];
+  select.addEventListener("change", () => drawMonth(select.value));
+  drawMonth(select.value);
+})();
+
+(function pipeline() {
+  document.getElementById("deliveries-sub").textContent =
+    F.int(ov.deliveries) + " remessas, " + F.int(ov.pipeline.stages) + " execuções de estágio: " + F.int(ov.pipeline.success) + " com sucesso, " +
+    F.int(ov.pipeline.blocked) + " bloqueada(s), " + F.int(ov.pipeline.failed) + " com falha.";
+  table(document.getElementById("deliveries"), [
+    { label: "Remessa", value: (d) => d.delivery },
+    { label: "Situação", value: (d) => { const s = document.createElement("span"); status(s, d.status === "blocked" ? "blocked" : "ok", d.status === "blocked" ? "Bloqueada" : "Escorada"); return s; } },
+    { label: "Recebidas", num: true, value: (d) => F.int(d.rows_received) },
+    { label: "Escoradas", num: true, value: (d) => F.int(d.rows_scored) },
+    { label: "Duração (ms)", num: true, value: (d) => F.int(d.duration_ms) },
+    { label: "Alertas", num: true, value: (d) => F.int(d.alerts_critical + d.alerts_warning) },
+  ], D.deliveries);
+  table(document.getElementById("stages"), [
+    { label: "Estágio", value: (s) => s.stage },
+    { label: "Execuções", num: true, value: (s) => F.int(s.runs) },
+    { label: "Sucesso", num: true, value: (s) => F.int(s.success) },
+    { label: "Bloqueio", num: true, value: (s) => F.int(s.blocked) },
+    { label: "Falha", num: true, value: (s) => F.int(s.failed) },
+    { label: "Mediana (ms)", num: true, value: (s) => F.int(s.median_ms) },
+    { label: "Máximo (ms)", num: true, value: (s) => F.int(s.max_ms) },
+  ], D.stage_stats);
+  const blocked = D.deliveries.filter((d) => d.status === "blocked");
+  const sub = document.getElementById("violations-sub"), holder = document.getElementById("violations");
+  if (!blocked.length) { sub.textContent = "Nenhuma remessa bloqueada no período."; return; }
+  sub.textContent = "Remessa " + blocked[0].delivery + ": " + F.int(blocked[0].rows_received) + " linhas em quarentena, nenhuma escorada.";
+  table(holder, [
+    { label: "Regra", value: (v) => v.rule_id },
+    { label: "Descrição", value: (v) => v.title },
+    { label: "Colunas", value: (v) => v.columns.join(", ") || "–" },
+    { label: "Falhas", num: true, value: (v) => F.int(v.n_failures) },
+  ], blocked[0].violations);
+})();
+
+(function analysis() {
+  const A = D.analysis;
+  if (!A.causal) { document.getElementById("analysis-section").remove(); return; }
+  table(document.getElementById("segments"), [
+    { label: "Período", value: (s) => D.phase_labels[s.period] || s.period },
+    { label: "Segmento", value: (s) => s.segment },
+    { label: "Carteira", num: true, value: (s) => F.pct(s.share) },
+    { label: "Observada", num: true, value: (s) => F.pct(s.observed_default_rate) },
+    { label: "Prevista", num: true, value: (s) => F.pct(s.predicted_default_rate) },
+    { label: "Diferença", num: true, value: (s) => (s.gap > 0 ? "+" : s.gap < 0 ? "−" : "") + nf(1).format(Math.abs(s.gap) * 100) + " p.p." },
+  ], A.segments.filter((s) => s.period === "referencia" || s.period === D.phases[D.phases.length - 1].phase));
+  const R = A.remediation, names = { campeao: "Manter o modelo atual", retreino_janela_recente: "Retreinar com a janela recente", retreino_referencia_mais_producao: "Retreinar com referência + produção" };
+  document.getElementById("remediation-sub").textContent =
+    "Treino com rótulos maduros até " + monthLabel(R.train_months[R.train_months.length - 1]) + "; teste em " + R.test_months.map(monthLabel).join(" e ") + ".";
+  table(document.getElementById("remediation"), [
+    { label: "Estratégia", value: (k) => names[k] || k },
+    { label: "ROC AUC", num: true, value: (k) => F.d3(R.strategies[k].roc_auc) },
+    { label: "KS", num: true, value: (k) => F.d3(R.strategies[k].ks) },
+    { label: "Aprovação", num: true, value: (k) => F.pct(R.strategies[k].approval_rate) },
+    { label: "Inadimpl. aprovados", num: true, value: (k) => F.pct(R.strategies[k].bad_rate_approved) },
+  ], Object.keys(R.strategies));
+  const attr = { sex: "Sexo", age_band: "Faixa etária", education: "Escolaridade", marriage: "Estado civil" };
+  table(document.getElementById("fairness"), [
+    { label: "Período", value: (f) => D.phase_labels[f.period] || f.period },
+    { label: "Atributo", value: (f) => attr[f.attribute] || f.attribute },
+    { label: "Grupo menos aprovado", value: (f) => f.group },
+    { label: "Impacto desigual", num: true, value: (f) => F.d2(f.disparate_impact) },
+    { label: "Situação", value: (f) => { const s = document.createElement("span"); status(s, f.adverse_impact ? "critical" : "ok", f.adverse_impact ? "Impacto adverso" : "Dentro do limite"); return s; } },
+  ], A.fairness);
+})();
+
+table(document.getElementById("all-alerts"), alertColumns(true), D.alerts);
+document.getElementById("footer").textContent =
+  "creditwatch " + D.package_version + " · dashboard gerado a partir de reports/monitoring, reports/observability e reports/analysis. " +
+  "Dataset: Default of Credit Card Clients (UCI, CC BY 4.0).";
+
+drawCharts();
+let resizeTimer, lastWidth = document.querySelector("main").clientWidth;
+new ResizeObserver((entries) => {
+  const width = Math.round(entries[0].contentRect.width);
+  if (width === lastWidth) return;  // so a largura muda o desenho; ignora mudancas de altura
+  lastWidth = width;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(drawCharts, 150);
+}).observe(document.querySelector("main"));
+</script>
+{% endraw %}
+</body>
+</html>
