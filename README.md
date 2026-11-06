@@ -11,15 +11,17 @@ Camada de **sustentação e confiabilidade** de um modelo de *credit scoring* em
 
 Repositório: <https://github.com/marcoaadc/tech-challenge-fase4-monitoramento-credito>
 
-| Para ver | Onde |
-|---|---|
-| Dashboard de monitoramento | [`reports/dashboard/index.html`](reports/dashboard/index.html) |
-| Relatórios do Evidently | [`mar/2025`](reports/evidently/drift_2025-03.html) (estável) · [`ago/2025`](reports/evidently/drift_2025-08.html) (drift de dados) · [`dez/2025`](reports/evidently/drift_2025-12.html) (drift de conceito) |
-| Lote bloqueado pelo contrato | [`reports/data_quality/blocked_2025-07-r1.json`](reports/data_quality/blocked_2025-07-r1.json) |
-| Causalidade, viés e remediação | [`reports/analysis/analysis_report.md`](reports/analysis/analysis_report.md) |
-| Alertas e métricas | [`alerts.jsonl`](reports/observability/alerts.jsonl) · [`metrics.prom`](reports/observability/metrics.prom) · [`pipeline_events.jsonl`](reports/observability/pipeline_events.jsonl) |
+| Para ver | Abrir no navegador | Arquivo no repositório |
+|---|---|---|
+| **Dashboard de monitoramento** | **[abrir o dashboard](https://marcoaadc.github.io/tech-challenge-fase4-monitoramento-credito/reports/dashboard/index.html)** | [`reports/dashboard/index.html`](reports/dashboard/index.html) |
+| Evidently — mar/2025, fase estável | [abrir o relatório](https://marcoaadc.github.io/tech-challenge-fase4-monitoramento-credito/reports/evidently/drift_2025-03.html) | [`drift_2025-03.html`](reports/evidently/drift_2025-03.html) |
+| Evidently — ago/2025, drift de dados | [abrir o relatório](https://marcoaadc.github.io/tech-challenge-fase4-monitoramento-credito/reports/evidently/drift_2025-08.html) | [`drift_2025-08.html`](reports/evidently/drift_2025-08.html) |
+| Evidently — dez/2025, drift de conceito | [abrir o relatório](https://marcoaadc.github.io/tech-challenge-fase4-monitoramento-credito/reports/evidently/drift_2025-12.html) | [`drift_2025-12.html`](reports/evidently/drift_2025-12.html) |
+| Lote bloqueado pelo contrato | — | [`blocked_2025-07-r1.json`](reports/data_quality/blocked_2025-07-r1.json) |
+| Causalidade, viés e remediação | — | [`analysis_report.md`](reports/analysis/analysis_report.md) |
+| Alertas, métricas e eventos | — | [`alerts.jsonl`](reports/observability/alerts.jsonl) · [`metrics.prom`](reports/observability/metrics.prom) · [`pipeline_events.jsonl`](reports/observability/pipeline_events.jsonl) |
 
-Os arquivos HTML são autocontidos: depois de clonar, basta abri-los no navegador.
+Os relatórios HTML são publicados pelo GitHub Pages a partir da branch `main`. Eles também são autocontidos: depois de clonar, basta abrir os arquivos no navegador.
 
 ---
 
