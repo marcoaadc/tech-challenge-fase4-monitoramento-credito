@@ -45,12 +45,13 @@ def run_validate(
     """Valida o arquivo, grava o relatorio e, se reprovado, move o lote para a quarentena."""
     path = Path(path)
     frame = read_table(path)
-    result = validate_batch(frame, build_contract(require_target, min_rows), batch=path.stem)
+    contract = build_contract(require_target, min_rows)
+    result = validate_batch(frame, contract, batch=path.stem)
     report_path = write_validation_report(
         result, settings.reports_dir / "data_quality" / f"validation_{path.stem}.json"
     )
     if not result.passed and quarantine:
-        quarantine_batch(frame, result, settings.quarantine_dir)
+        quarantine_batch(frame, result, settings.quarantine_dir, set(contract.columns))
     logger.info("relatorio de validacao gravado em %s", report_path)
     return result
 

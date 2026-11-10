@@ -207,3 +207,38 @@ def test_demo_cpfs_are_never_valid():
         cpf = fake_cpf(rng)
         assert len(cpf) == 11
         assert cpf[9:] != cpf_check_digits(cpf[:9])
+
+
+def test_fraction_in_integer_column_is_rejected_instead_of_truncated(production_features):
+    """Sem a checagem, a coercao de tipos transformaria 0.6 em 0 e o lote passaria."""
+    fractional = production_features.astype({"pay_status_1": "float64", "limit_bal": "float64"})
+    fractional.loc[fractional.index[:3], "pay_status_1"] = 0.6
+    fractional.loc[fractional.index[5], "limit_bal"] = 50_000.7
+    result = validate_batch(fractional, PRODUCTION, "fraction")
+    assert result.violated_rules == ["DQ-10"]
+    violation = result.violations[0]
+    assert violation.columns == ["limit_bal", "pay_status_1"]
+    assert violation.n_failures == 4
+    assert result.rows_with_failures == 4
+    with pytest.raises(DataContractError):
+        enforce_contract(fractional, PRODUCTION, "fraction")
+
+
+def test_float_column_with_whole_numbers_still_passes(production_features):
+    as_float = production_features.astype({"age": "float64", "bill_amt_1": "float64"})
+    assert validate_batch(as_float, PRODUCTION, "floats").passed
+
+
+def test_quarantine_does_not_keep_columns_outside_the_contract(production_features, tmp_path):
+    """Um dado pessoal enviado por engano nao pode ganhar uma copia na quarentena."""
+    leaked = corrupt_batch(production_features, ("leaked_pii_column", "invalid_ages"))
+    with pytest.raises(DataContractError):
+        enforce_contract(leaked, PRODUCTION, "pii-batch", quarantine_dir=tmp_path)
+    quarantined = pd.read_csv(tmp_path / "pii-batch" / "batch.csv")
+    assert "cpf" not in quarantined.columns
+    assert len(quarantined) == len(leaked)
+    assert set(quarantined.columns) == set(production_features.columns)
+    text = (tmp_path / "pii-batch" / "batch.csv").read_text(encoding="utf-8")
+    assert not any(cpf in text for cpf in leaked["cpf"].head(50))
+    report = json.loads((tmp_path / "pii-batch" / "validation_report.json").read_text(encoding="utf-8"))
+    assert "cpf" in next(v for v in report["violations"] if v["rule_id"] == "DQ-09")["columns"]

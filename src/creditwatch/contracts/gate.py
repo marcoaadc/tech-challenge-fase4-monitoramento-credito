@@ -1,9 +1,9 @@
 """Portao de qualidade: valida um lote contra o contrato e bloqueia a ingestao se ele reprovar.
 
-O lote reprovado nao segue para o modelo: e movido para a quarentena junto com um relatorio que
+O lote reprovado nao segue para o modelo: e copiado para a quarentena junto com um relatorio que
 diz *qual regra* falhou, *em quantas linhas* e *em quais colunas*. O relatorio guarda exemplos de
 valores apenas das colunas previstas no contrato; de colunas inesperadas (possivel PII) registra
-somente o nome.
+somente o nome, e a copia em quarentena tambem descarta essas colunas.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pandera.pandas as pa
 from pandera.errors import SchemaErrors, SchemaWarning
@@ -27,6 +28,7 @@ logger = logging.getLogger("creditwatch.contracts.gate")
 MAX_EXAMPLES = 5
 SCHEMA_RULE = "DQ-09"
 TYPE_RULE = "DQ-10"
+FAILURE_COLUMNS = ["schema_context", "column", "check", "check_number", "failure_case", "index"]
 
 
 class DataContractError(ValueError):
@@ -132,15 +134,50 @@ def _summarize(failure_cases: pd.DataFrame, contract_columns: set[str]) -> tuple
     return violations, int(row_level["index"].nunique())
 
 
+def _fractional_cases(frame: pd.DataFrame, contract: pa.DataFrameSchema) -> pd.DataFrame:
+    """Valores com fracao em colunas inteiras, no formato dos casos de falha do Pandera.
+
+    O contrato coage os tipos (um CSV le inteiros como float quando ha nulos), e a coercao
+    truncaria ``17.9`` para ``17`` sem acusar nada. Esta checagem roda antes e reporta a fracao
+    como violacao de tipo (DQ-10).
+    """
+    rows: list[dict] = []
+    for name, column in contract.columns.items():
+        if name not in frame.columns or str(column.dtype) != "int64":
+            continue
+        values = pd.to_numeric(frame[name], errors="coerce")
+        fractional = values[values.notna() & np.isfinite(values) & (values % 1 != 0)]
+        rows.extend(
+            {
+                "schema_context": "Column",
+                "column": name,
+                "check": f"{TYPE_RULE}: fração em coluna inteira",
+                "check_number": None,
+                "failure_case": value,
+                "index": index,
+            }
+            for index, value in fractional.items()
+        )
+    return pd.DataFrame(rows, columns=FAILURE_COLUMNS)
+
+
 def validate_batch(frame: pd.DataFrame, contract: pa.DataFrameSchema, batch: str) -> ContractResult:
-    """Valida ``frame`` e devolve o resultado, sem levantar excecao e sem alterar o lote."""
+    """Valida ``frame`` e devolve o resultado, sem levantar excecao e sem alterar o lote.
+
+    Limite conhecido: quando uma coluna numerica traz texto, o Pandera nao consegue avaliar as
+    demais regras daquela coluna (faixa, dominio); so a violacao de tipo (DQ-10) e reportada, e as
+    outras aparecem depois que o tipo for corrigido na origem.
+    """
     result = ContractResult(batch=batch, contract=str(contract.name), n_rows=len(frame), n_columns=frame.shape[1])
+    cases = _fractional_cases(frame, contract)
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         try:
             contract.validate(frame, lazy=True)
         except SchemaErrors as exc:
-            result.violations, result.rows_with_failures = _summarize(exc.failure_cases, set(contract.columns))
+            cases = pd.concat([exc.failure_cases[FAILURE_COLUMNS], cases], ignore_index=True)
+    if not cases.empty:
+        result.violations, result.rows_with_failures = _summarize(cases, set(contract.columns))
     for warning in caught:
         if issubclass(warning.category, SchemaWarning):
             message = str(warning.message)
@@ -156,10 +193,19 @@ def write_validation_report(result: ContractResult, path: Path) -> Path:
     return path
 
 
-def quarantine_batch(frame: pd.DataFrame, result: ContractResult, quarantine_dir: Path) -> Path:
-    """Grava o lote reprovado e o seu relatorio na quarentena (acesso restrito, retencao curta)."""
+def quarantine_batch(
+    frame: pd.DataFrame, result: ContractResult, quarantine_dir: Path, contract_columns: set[str] | None = None
+) -> Path:
+    """Grava o lote reprovado e o seu relatorio na quarentena (acesso restrito, retencao curta).
+
+    Com ``contract_columns``, as colunas fora do contrato **nao sao gravadas**: se a origem enviou
+    um dado pessoal por engano (ex.: ``cpf``), a quarentena nao pode se tornar uma copia dele. O
+    nome da coluna descartada fica no relatorio (regra DQ-09), o que basta para a origem corrigir.
+    """
     target = Path(quarantine_dir) / result.batch
     target.mkdir(parents=True, exist_ok=True)
+    if contract_columns is not None:
+        frame = frame[[column for column in frame.columns if column in contract_columns]]
     frame.to_csv(target / "batch.csv", index=False, lineterminator="\n")
     write_validation_report(result, target / "validation_report.json")
     return target
@@ -175,8 +221,8 @@ def enforce_contract(
     result = validate_batch(frame, contract, batch)
     if not result.passed:
         if quarantine_dir is not None:
-            location = quarantine_batch(frame, result, quarantine_dir)
-            logger.error("lote %s BLOQUEADO e movido para %s", batch, location)
+            location = quarantine_batch(frame, result, quarantine_dir, set(contract.columns))
+            logger.error("lote %s BLOQUEADO; copia em quarentena em %s", batch, location)
         raise DataContractError(result)
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", SchemaWarning)
