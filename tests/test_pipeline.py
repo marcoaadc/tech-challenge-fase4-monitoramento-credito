@@ -7,14 +7,16 @@ import json
 import pandas as pd
 import pytest
 
+from creditwatch.analysis.remediation import CEILING, STRATEGIES
+from creditwatch.dashboard.build import build_dashboard
 from creditwatch.data.schema import ID_COLUMN, TARGET
 from creditwatch.data.split import SPLIT_COLUMN
 from creditwatch.model.registry import CreditScorer
 from creditwatch.observability.alerts import read_alerts
-from creditwatch.observability.events import read_events
+from creditwatch.observability.events import StageTracker, read_events
 from creditwatch.pipelines import validate
 from creditwatch.pipelines._cli import read_json, read_table
-from creditwatch.pipelines.monitor import checkpoint_months, run_monitor
+from creditwatch.pipelines.monitor import ReferenceBundle, checkpoint_months, process_delivery, run_monitor
 from creditwatch.pipelines.run_all import main as run_all_main
 from creditwatch.pipelines.simulate import MANIFEST_FILENAME
 from creditwatch.simulation.corruption import DEMO_DEFECTS, expected_rules
@@ -106,11 +108,21 @@ def test_data_drift_is_detected_before_the_model_degrades(workspace, timeline):
 def test_concept_drift_degrades_the_model(workspace, timeline):
     concept = timeline[timeline["phase"] == "drift_de_conceito"]
     reference_auc = workspace.overview["reference_metrics"]["roc_auc"]
-    assert concept["roc_auc"].is_monotonic_decreasing
+    # A queda e progressiva: cada bimestre pior que o anterior (mes a mes ha ruido de amostra).
+    assert concept["roc_auc"].iloc[2:].mean() < concept["roc_auc"].iloc[:2].mean() - 0.05
     assert concept["roc_auc"].iloc[-1] < reference_auc - 0.10
     assert concept["bad_rate_approved"].iloc[-1] > 2 * workspace.overview["reference_metrics"]["bad_rate_approved"]
-    assert workspace.overview["first_performance_alert"] == "2025-09"
+    # O primeiro alerta de performance sai na fase de conceito, nunca antes.
+    assert workspace.overview["first_performance_alert"] in ("2025-09", "2025-10")
     assert concept["labels_available_at"].iloc[0] == "2025-11"
+
+
+def test_reference_performance_is_measured_on_the_test_split_only(workspace):
+    """A particao de validacao escolheu o modelo e o corte: nao pode servir de base de performance."""
+    metadata = read_json(workspace.settings.models_dir / "metadata.json")
+    reference = workspace.overview["reference_metrics"]
+    assert reference["n"] == metadata["reference"]["splits"]["test"]
+    assert reference["roc_auc"] == pytest.approx(metadata["metrics"]["test"]["roc_auc"], abs=1e-4)
 
 
 def test_drifted_features_are_the_ones_the_scenario_changed(workspace):
@@ -165,7 +177,10 @@ def test_causal_attribution_blames_concept_drift_for_the_auc_drop(workspace):
     shapley = causal["shapley"]["roc_auc"]
     assert min(shapley, key=shapley.get) == "concept"
     assert shapley["concept"] < -0.08
-    assert abs(shapley["new_profiles"]) < 0.03
+    assert abs(shapley["new_profiles"]) < 0.05
+    assert causal["sample_size"] == workspace.settings.batch_size  # mesmo tamanho das remessas
+    assert len(causal["seeds"]) == 2
+    assert causal["shapley_std"]["roc_auc"]["concept"] < 0.05
     # Eficiencia: as parcelas somam exatamente o efeito total.
     assert sum(shapley.values()) == pytest.approx(causal["total_effect"]["roc_auc"], abs=1e-9)
     # O drift de conceito nao mexe nas features: nao explica nenhuma feature com drift.
@@ -173,24 +188,66 @@ def test_causal_attribution_blames_concept_drift_for_the_auc_drop(workspace):
     assert causal["shapley"]["n_drifted"]["inflation"] > 3
 
 
-def test_segment_diagnosis_points_to_leveraged_good_payers(workspace):
+def test_segment_diagnosis_points_to_on_time_customers_with_high_utilization(workspace):
     segments = {(row["period"], row["segment"]): row for row in workspace.analysis["segments"]}
-    assert abs(segments[("referencia", "em dia, alavancado")]["gap"]) < 0.03
-    assert segments[("drift_de_conceito", "em dia, alavancado")]["gap"] > 0.12
-    assert abs(segments[("drift_de_conceito", "em dia, baixa utilização")]["gap"]) < 0.04
+    assert abs(segments[("referencia", "em dia, utilização alta")]["gap"]) < 0.03
+    assert segments[("drift_de_conceito", "em dia, utilização alta")]["gap"] > 0.10
+    assert abs(segments[("drift_de_conceito", "em dia, utilização baixa")]["gap"]) < 0.05
 
 
-def test_remediation_recovers_part_of_the_lost_performance(workspace):
-    strategies = workspace.analysis["remediation"]["strategies"]
-    assert strategies["retreino_janela_recente"]["roc_auc"] > strategies["campeao"]["roc_auc"] + 0.02
-    assert workspace.analysis["remediation"]["test_months"] == ["2025-11", "2025-12"]
-    assert "2025-11" not in workspace.analysis["remediation"]["train_months"]
+def test_calibration_scan_finds_the_affected_customers_without_simulator_knowledge(workspace):
+    diagnosis = workspace.analysis["diagnosis"]
+    # O corte de utilizacao vem da referencia (mediana), nao da constante do simulador (0,5).
+    assert 0.2 < diagnosis["utilization_cut"] < 0.45
+    top = [row["feature"] for row in diagnosis["calibration_scan"]["by_feature"][:8]]
+    assert top[0] == "pay_status_1"  # quem esta em dia e quem o modelo passou a errar
+    assert {"utilization_1", "bill_amt_1"} & set(top)
+    worst = diagnosis["calibration_scan"]["by_feature"][0]
+    assert worst["worst_bin"] == "0"
+    assert worst["worst_excess_gap"] > 0.10
+
+
+def test_remediation_backtest_has_no_temporal_or_customer_leakage(workspace):
+    remediation = workspace.analysis["remediation"]
+    strategies = remediation["strategies"]
+    assert remediation["test_months"] == ["2025-11", "2025-12"]
+    # Com atraso de dois meses, em novembro so ha rotulo ate setembro.
+    assert remediation["label_lag_months"] == 2
+    assert remediation["train_months"][-1] == "2025-09"
+    assert remediation["disjoint_customers"]
+    assert remediation["folds"] == 2
+    assert set(strategies) == {*STRATEGIES, CEILING}
+    # Nenhuma estrategia, nem o teto com rotulos imediatos, devolve o desempenho da referencia.
+    reference_auc = workspace.overview["reference_metrics"]["roc_auc"]
+    assert all(row["roc_auc"] < reference_auc - 0.05 for row in strategies.values())
+    assert strategies[CEILING]["roc_auc"] > strategies["campeao"]["roc_auc"]
+
+
+def test_shorter_label_lag_lets_the_recalibration_see_the_affected_segment(workspace):
+    main = workspace.analysis["remediation"]
+    shorter = main["shorter_label_lag"]
+    assert shorter["label_lag_months"] == 1
+    assert shorter["train_months"][-1] == "2025-10"
+    assert shorter["test_months"] == main["test_months"]
+    segment = "em dia, utilização alta"
+    # Um mes a mais de rotulos revela o segmento que passou a inadimplir.
+    assert shorter["segment_calibration_factors"][segment] > main["segment_calibration_factors"][segment] + 0.15
+    assert shorter["strategies"]["campeao"]["roc_auc"] == main["strategies"]["campeao"]["roc_auc"]
 
 
 def test_fairness_audit_covers_all_periods_and_attributes(workspace):
     fairness = workspace.analysis["fairness"]
     assert set(fairness["by_period"]) == {"referencia", "estavel", "drift_de_dados", "drift_de_conceito"}
     assert len(fairness["worst_groups"]) == 16
+    for row in fairness["worst_groups"]:
+        low, high = row["disparate_impact_ci"]
+        assert low <= row["disparate_impact"] <= high
+        assert row["verdict"] in ("impacto adverso", "inconclusivo", "dentro do limite")
+    assert fairness["largest_equal_opportunity_gap"]["equal_opportunity_gap"] > 0
+    # Grupos pequenos aparecem no relatorio, marcados como fora da comparacao.
+    excluded = [row for rows in fairness["by_period"].values() for row in rows if not row["compared"]]
+    assert excluded
+    assert all(row["n"] < 200 for row in excluded)
     # Os atributos protegidos nao acrescentam poder de discriminacao: exclui-los nao custa desempenho.
     ablation = fairness["protected_attribute_ablation"]
     assert abs(ablation["gain_test"]) < 0.01
@@ -213,6 +270,8 @@ def test_dashboard_is_self_contained_and_carries_valid_data(workspace):
     assert [phase["phase"] for phase in payload["phases"]] == ["estavel", "drift_de_dados", "drift_de_conceito"]
     assert len(payload["deliveries"]) == 13
     assert payload["analysis"]["causal"]["mechanisms"] == ["inflation", "stress", "new_profiles", "concept"]
+    assert payload["analysis"]["scan"][0]["feature"] == "pay_status_1"
+    assert "teto_rotulos_imediatos" in payload["analysis"]["remediation"]["strategy_labels"]
     assert len(payload["timeline"]["roc_auc"]) == 12
     assert {stage["stage"] for stage in payload["stage_stats"]} >= {"contract", "score", "drift", "performance"}
     assert len(payload["rules"]) >= 13
@@ -261,3 +320,57 @@ def test_run_all_cli_reuses_the_stage_functions(workspace, monkeypatch):
     finally:
         workspace.settings.events_path.write_text(events_before, encoding="utf-8")
     assert calls == ["run_ingest", "run_train", "run_simulate", "run_monitor", "run_analyze", "run_dashboard"]
+
+
+def test_rejected_label_file_does_not_stop_the_monitoring(workspace):
+    """Rotulos invalidos deixam a performance da remessa indisponivel, mas a remessa e escorada e o run segue."""
+    settings = workspace.settings
+    manifest = read_json(settings.production_dir / MANIFEST_FILENAME)
+    delivery = dict(next(d for d in manifest["deliveries"] if d["delivery"] == "2025-02"))
+    labels = read_table(settings.production_dir / delivery["labels_file"])
+    scorer = CreditScorer.load(settings.models_dir)
+    reference = ReferenceBundle.build(read_table(settings.reference_path), scorer)
+
+    for name, broken, problem in (
+        ("labels_invalid.parquet", labels.assign(**{TARGET: 7}), "DQ-12"),
+        ("labels_incomplete.parquet", labels.head(len(labels) - 25), "faltam rotulos de 25"),
+    ):
+        broken.to_parquet(settings.production_dir / name, index=False)
+        tracker = StageTracker("monitor")
+        summary = process_delivery(
+            {**delivery, "labels_file": name}, settings, scorer, reference, tracker, with_evidently=False
+        )
+        (settings.production_dir / name).unlink()
+
+        assert summary["status"] == "scored"
+        assert summary["rows_scored"] == settings.batch_size
+        assert summary["performance"] is None
+        assert problem in summary["labels"]["problem"]
+        assert summary["drift"]["n_drifted"] == 0  # o drift de entrada continua sendo calculado
+        assert [alert["title"] for alert in summary["alerts"]] == ["Arquivo de rótulos rejeitado"]
+        statuses = {event.stage: event.status for event in tracker.events}
+        assert statuses["performance"] == "blocked"
+        assert statuses["score"] == "success"
+
+
+def test_dashboard_renders_when_no_label_has_matured(workspace, tmp_path):
+    """Sem rotulos, as colunas de performance nem existem: o dashboard tem de abrir e nao pode acusar degradacao."""
+    import shutil
+
+    reports = tmp_path / "reports"
+    shutil.copytree(workspace.settings.reports_dir, reports)
+    timeline_path = reports / "monitoring" / "timeline.csv"
+    timeline = pd.read_csv(timeline_path)
+    performance = ["roc_auc", "ks", "gini", "brier", "precision", "recall", "default_rate", "calibration_gap"]
+    timeline.drop(columns=[*performance, "bad_rate_approved", "roc_auc_drop", "labels_available_at"]).to_csv(
+        timeline_path, index=False
+    )
+    settings = workspace.settings.model_copy(update={"reports_dir": reports})
+
+    html = build_dashboard(settings, tmp_path / "dashboard.html").read_text(encoding="utf-8")
+    start = html.index('<script type="application/json" id="payload">') + len(
+        '<script type="application/json" id="payload">'
+    )
+    payload = json.loads(html[start : html.index("</script>", start)])
+    assert payload["timeline"]["roc_auc"] == [None] * 12
+    assert payload["timeline"]["n_drifted"][-1] > 0

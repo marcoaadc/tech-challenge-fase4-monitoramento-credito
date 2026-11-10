@@ -38,6 +38,7 @@ from creditwatch.observability.alerts import (
     add_months,
     data_quality_alert,
     drift_alerts,
+    label_quality_alert,
     performance_alerts,
     prediction_drift_alert,
     write_alerts,
@@ -59,15 +60,23 @@ class ReferenceBundle:
     """Linhas de base do monitoramento, todas derivadas do Dataset de Referencia."""
 
     full: pd.DataFrame  # referencia completa com features de engenharia: base do drift de entrada
-    holdout: pd.DataFrame  # particoes val+test (fora do ajuste) com score: base de score e performance
-    metrics: dict[str, float]  # metricas do modelo no holdout
+    holdout: pd.DataFrame  # particoes val+test (fora do ajuste) com score: base da distribuicao do score
+    metrics: dict[str, float]  # metricas do modelo na particao de teste: base de performance
 
     @classmethod
     def build(cls, reference: pd.DataFrame, scorer: CreditScorer) -> ReferenceBundle:
+        """Monta as linhas de base.
+
+        A performance de referencia usa so a particao ``test``: a ``val`` escolheu o modelo e o
+        ponto de corte, e medir nela daria uma base otimista (alertas de queda disparariam cedo).
+        Para comparar distribuicoes de score, ``val`` e ``test`` juntas dao uma base maior e
+        continuam fora do ajuste do modelo.
+        """
         full = add_engineered_features(reference)
         holdout = full[full[SPLIT_COLUMN] != "train"].copy()
         holdout[SCORE] = scorer.score(holdout)
-        metrics = classification_metrics(holdout[TARGET].to_numpy(), holdout[SCORE].to_numpy(), scorer.threshold)
+        test = holdout[holdout[SPLIT_COLUMN] == "test"]
+        metrics = classification_metrics(test[TARGET].to_numpy(), test[SCORE].to_numpy(), scorer.threshold)
         return cls(full=full, holdout=holdout, metrics=metrics)
 
 
@@ -190,16 +199,37 @@ def process_delivery(
         event.details = {"n_drifted": len(drift.drifted_features), "severity": drift.severity}
 
     if delivery.get("labels_file"):
+        # Rotulos invalidos nao derrubam o monitoramento: a performance da remessa fica indisponivel,
+        # um alerta e emitido e as remessas seguintes continuam sendo processadas.
         with tracker.stage("performance", batch=batch_id, rows_in=len(scored)) as event:
-            labels, _ = enforce_contract(
-                read_table(production_dir / delivery["labels_file"]), build_label_contract(), batch=f"labels-{batch_id}"
-            )
-            scored = scored.merge(labels, on=ID_COLUMN, how="inner", validate="one_to_one")
-            if len(scored) != summary["rows_scored"]:
-                raise ValueError(f"rotulos de {batch_id} nao cobrem todas as propostas escoradas")
+            try:
+                labels, _ = enforce_contract(
+                    read_table(production_dir / delivery["labels_file"]),
+                    build_label_contract(),
+                    batch=f"labels-{batch_id}",
+                )
+                problem = None
+            except DataContractError as exc:
+                problem = f"regras violadas {', '.join(exc.result.violated_rules)}"
+            if problem is None:
+                labeled = scored.merge(labels, on=ID_COLUMN, how="inner", validate="one_to_one")
+                missing = len(scored) - len(labeled)
+                if missing:
+                    problem = f"faltam rotulos de {missing} propostas escoradas"
+            if problem is not None:
+                alerts.append(label_quality_alert(month, batch_id, problem))
+                summary["alerts"] = [alert.as_dict() for alert in alerts]
+                summary["labels"] = {"status": "bloqueado", "problem": problem}
+                event.rows_out = 0
+                raise StageBlocked(f"rotulos de {batch_id} rejeitados: {problem}")
+            scored = labeled
             metrics = classification_metrics(scored[TARGET].to_numpy(), scored[SCORE].to_numpy(), scorer.threshold)
+            reference_n = int(reference.metrics["n"])
             target_test = two_proportion_test(
-                int(reference.holdout[TARGET].sum()), len(reference.holdout), int(scored[TARGET].sum()), len(scored)
+                round(reference.metrics["default_rate"] * reference_n),
+                reference_n,
+                int(scored[TARGET].sum()),
+                len(scored),
             )
             summary["performance"] = {
                 **metrics,
