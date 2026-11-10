@@ -11,15 +11,18 @@ from creditwatch.simulation.mechanisms import (
     apply_concept_drift,
     apply_inflation,
     sample_batch,
+    sample_positions,
     sampling_weights,
 )
 from creditwatch.simulation.scenario import (
     CONCEPT_DRIFT,
     DATA_DRIFT,
     MECHANISMS,
+    SOURCE_ID,
     STABLE,
     MonthPlan,
     batch_ids,
+    batch_lineage,
     default_scenario,
     generate_batch,
     month_seed,
@@ -78,6 +81,8 @@ def test_inflation_keeps_limit_label_and_integer_types(stable_batch):
 def test_concept_drift_changes_labels_but_not_features(stable_batch):
     drifted = apply_concept_drift(stable_batch, 1.0, np.random.default_rng(2))
     pd.testing.assert_frame_equal(drifted[FEATURES], stable_batch[FEATURES])
+    with pytest.raises(ValueError, match="informe rng ou draws"):
+        apply_concept_drift(stable_batch, 1.0)
     assert (drifted[TARGET] != stable_batch[TARGET]).sum() > 100
     assert apply_concept_drift(stable_batch, 0.0, np.random.default_rng(2)) is stable_batch
 
@@ -156,3 +161,56 @@ def test_generate_batch_assigns_month_and_unique_ids(pool):
     assert batch[ID_COLUMN].min() == 202504 * 100_000 + 1
     assert batch_ids("2025-04", 3).tolist() == [20250400001, 20250400002, 20250400003]
     assert not set(batch[ID_COLUMN]) & set(pool[ID_COLUMN])
+
+
+def test_batch_lineage_recovers_the_pool_customer_of_each_proposal(pool):
+    plan = default_scenario()[9]
+    batch = generate_batch(pool, plan, 800)
+    lineage = batch_lineage(pool, plan, 800)
+    assert lineage[ID_COLUMN].tolist() == batch[ID_COLUMN].tolist()
+    assert lineage[SOURCE_ID].is_unique  # dentro do mes, a amostragem e sem reposicao
+    assert set(lineage[SOURCE_ID]) <= set(pool[ID_COLUMN])
+    # Idade e limite nao sao alterados por nenhum mecanismo: tem de coincidir com o cliente de origem.
+    source = pool.set_index(ID_COLUMN).loc[lineage[SOURCE_ID]]
+    assert (source["age"].to_numpy() == batch["age"].to_numpy()).all()
+    assert (source[LIMIT].to_numpy() == batch[LIMIT].to_numpy()).all()
+    assert SOURCE_ID not in batch.columns  # o lote de producao nao carrega a linhagem
+
+
+def test_the_same_pool_customer_can_be_drawn_in_different_months(pool):
+    scenario = default_scenario()
+    first = batch_lineage(pool, scenario[0], 2000)
+    second = batch_lineage(pool, scenario[1], 2000)
+    assert set(first[SOURCE_ID]) & set(second[SOURCE_ID])
+
+
+def test_sample_positions_follow_the_weights_and_reject_oversized_batches(pool):
+    positions = sample_positions(pool, 3000, np.random.default_rng(0), stress=0.5)
+    assert len(set(positions)) == 3000
+    with pytest.raises(ValueError, match="maior que o pool"):
+        sample_positions(pool, len(pool) + 1, np.random.default_rng(0))
+
+
+def test_scenarios_with_the_same_seed_share_their_random_noise(pool):
+    """Numeros aleatorios comuns: ligar um mecanismo nao pode embaralhar o ruido dos outros."""
+    plan = default_scenario()[-1]
+    full = batch_lineage(pool, plan, 2000)[SOURCE_ID]
+    without_concept = batch_lineage(pool, plan.only("inflation", "stress", "new_profiles"), 2000)[SOURCE_ID]
+    without_inflation = batch_lineage(pool, plan.only("stress", "new_profiles", "concept"), 2000)[SOURCE_ID]
+    # Conceito e inflacao nao mexem na composicao da carteira: os mesmos clientes, na mesma ordem.
+    assert full.tolist() == without_concept.tolist() == without_inflation.tolist()
+
+    # Mudar a composicao troca apenas parte dos clientes; com ruido independente a sobreposicao seria de ~13%.
+    baseline = batch_lineage(pool, plan.only(), 2000)[SOURCE_ID]
+    only_stress = batch_lineage(pool, plan.only("stress"), 2000)[SOURCE_ID]
+    assert len(set(baseline) & set(only_stress)) > 1200
+
+
+def test_concept_drift_gives_each_customer_the_same_draw_in_every_scenario(pool):
+    plan = default_scenario()[-1]
+    with_inflation = generate_batch(pool, plan, 2000)
+    without_inflation = generate_batch(pool, plan.only("stress", "new_profiles", "concept"), 2000)
+    # A inflacao muda faturas, entao a utilizacao muda e alguns clientes entram ou saem do segmento
+    # afetado; mas quem esta em atraso (curas) recebe exatamente o mesmo sorteio nos dois cenarios.
+    delayed = with_inflation[PAY_STATUS[0]] >= 1
+    assert with_inflation.loc[delayed, TARGET].tolist() == without_inflation.loc[delayed, TARGET].tolist()

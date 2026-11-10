@@ -14,10 +14,11 @@ import numpy as np
 import pandas as pd
 
 from creditwatch.data.schema import BATCH_MONTH, ID_COLUMN
-from creditwatch.simulation.mechanisms import apply_concept_drift, apply_inflation, sample_batch
+from creditwatch.simulation.mechanisms import apply_concept_drift, apply_inflation, sample_positions
 
 STABLE, DATA_DRIFT, CONCEPT_DRIFT = "estavel", "drift_de_dados", "drift_de_conceito"
 MECHANISMS = ("inflation", "stress", "new_profiles", "concept")
+SOURCE_ID = "source_customer_id"
 
 
 @dataclass(frozen=True)
@@ -75,6 +76,21 @@ def batch_ids(month: str, n: int) -> np.ndarray:
     return int(month.replace("-", "")) * 100_000 + np.arange(1, n + 1, dtype="int64")
 
 
+def _draw(pool: pd.DataFrame, plan: MonthPlan, n: int, seed: int) -> tuple[np.ndarray, np.ndarray]:
+    """Sorteia o lote: posicoes dos clientes no pool e o numero uniforme de cada um para o drift de conceito.
+
+    A amostragem e o drift de conceito usam fluxos aleatorios independentes, e o sorteio do drift
+    de conceito pertence ao cliente, nao a posicao no lote. Com a mesma seed, ligar ou desligar um
+    mecanismo nao muda o ruido dos outros: e o que permite comparar cenarios na analise causal.
+    """
+    sampling_seed, concept_seed = np.random.SeedSequence(month_seed(seed, plan.month)).spawn(2)
+    positions = sample_positions(
+        pool, n, np.random.default_rng(sampling_seed), new_profiles=plan.new_profiles, stress=plan.stress
+    )
+    uniforms = np.random.default_rng(concept_seed).random(len(pool))
+    return positions, uniforms[positions]
+
+
 def generate_batch(pool: pd.DataFrame, plan: MonthPlan, n: int, seed: int = 42) -> pd.DataFrame:
     """Gera o lote de producao de um mes aplicando os mecanismos na ordem causal.
 
@@ -82,10 +98,21 @@ def generate_batch(pool: pd.DataFrame, plan: MonthPlan, n: int, seed: int = 42) 
     2. ``inflation``: como os valores nominais desses clientes aparecem;
     3. ``concept``: como eles passam a se comportar (rotulo observado depois).
     """
-    rng = np.random.default_rng(month_seed(seed, plan.month))
-    batch = sample_batch(pool, n, rng, new_profiles=plan.new_profiles, stress=plan.stress)
+    positions, concept_draws = _draw(pool, plan, n, seed)
+    batch = pool.iloc[positions].reset_index(drop=True)
     batch = apply_inflation(batch, plan.inflation)
-    batch = apply_concept_drift(batch, plan.concept, rng)
+    batch = apply_concept_drift(batch, plan.concept, draws=concept_draws)
     batch[ID_COLUMN] = batch_ids(plan.month, len(batch))
     batch.insert(0, BATCH_MONTH, plan.month)
     return batch
+
+
+def batch_lineage(pool: pd.DataFrame, plan: MonthPlan, n: int, seed: int = 42) -> pd.DataFrame:
+    """Para cada proposta do lote, o cliente do pool de onde ela foi amostrada.
+
+    O mesmo cliente do pool pode ser sorteado em meses diferentes. O lote de producao nao carrega
+    essa informacao (para o modelo, cada proposta e um cliente novo); ela e reconstruida aqui, com
+    a mesma seed, apenas para que os experimentos separem treino e teste por cliente.
+    """
+    positions, _ = _draw(pool, plan, n, seed)
+    return pd.DataFrame({ID_COLUMN: batch_ids(plan.month, n), SOURCE_ID: pool[ID_COLUMN].to_numpy()[positions]})
