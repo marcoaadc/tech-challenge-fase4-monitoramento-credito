@@ -5,10 +5,12 @@ Servem de base auditavel para os alertas e de contraprova do relatorio do Eviden
 - **PSI** (Population Stability Index): tamanho do efeito, padrao da industria de credito.
   PSI < 0,10 estavel; 0,10-0,25 mudanca moderada; >= 0,25 mudanca significativa.
 - **Kolmogorov-Smirnov** (numericas): maior distancia entre as distribuicoes acumuladas (D) e p-valor.
-- **Qui-quadrado** (categoricas): independencia entre periodo e categoria, com V de Cramer.
+- **Qui-quadrado** (categoricas): p-valor do teste de homogeneidade, com a distancia de variacao
+  total (TVD) como tamanho do efeito.
 
 Com milhares de linhas por lote o p-valor fica significativo para diferencas irrelevantes; por isso
-as decisoes usam tamanho de efeito (PSI, D, V) e o p-valor entra apenas como evidencia.
+as decisoes usam tamanho de efeito (PSI, D, TVD) e o p-valor entra apenas como evidencia. Os tres
+tamanhos de efeito nao dependem do numero de linhas do lote nem da referencia.
 """
 
 from __future__ import annotations
@@ -74,7 +76,12 @@ def ks_test(reference: pd.Series | np.ndarray, current: pd.Series | np.ndarray) 
 
 
 def chi_square_test(reference: pd.Series, current: pd.Series) -> StatTest:
-    """Qui-quadrado de homogeneidade; ``statistic`` e o V de Cramer (tamanho do efeito em [0, 1])."""
+    """Qui-quadrado de homogeneidade; ``statistic`` e a distancia de variacao total (TVD), em [0, 1].
+
+    A TVD e metade da soma das diferencas absolutas entre as proporcoes de cada categoria: a
+    fracao da carteira que mudou de categoria. E o analogo categorico do D de Kolmogorov-Smirnov
+    e, ao contrario do V de Cramer, nao depende da razao entre os tamanhos das duas amostras.
+    """
     categories = sorted(set(pd.unique(reference)) | set(pd.unique(current)))
     table = np.vstack(
         [
@@ -85,9 +92,10 @@ def chi_square_test(reference: pd.Series, current: pd.Series) -> StatTest:
     table = table[:, table.sum(axis=0) > 0]
     if table.shape[1] < 2:
         return StatTest(statistic=0.0, p_value=1.0)
-    chi2, p_value, _, _ = stats.chi2_contingency(table)
-    cramers_v = float(np.sqrt(chi2 / table.sum()))  # tabela 2 x k: min(r - 1, c - 1) = 1
-    return StatTest(statistic=cramers_v, p_value=float(p_value))
+    _, p_value, _, _ = stats.chi2_contingency(table)
+    proportions = table / table.sum(axis=1, keepdims=True)
+    total_variation = float(0.5 * np.abs(proportions[0] - proportions[1]).sum())
+    return StatTest(statistic=total_variation, p_value=float(p_value))
 
 
 def two_proportion_test(successes_ref: int, n_ref: int, successes_cur: int, n_cur: int) -> StatTest:

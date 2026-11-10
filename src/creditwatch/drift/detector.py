@@ -21,7 +21,7 @@ SEVERITY_ORDER = {OK: 0, WARNING: 1, CRITICAL: 2}
 class DriftThresholds:
     psi_warning: float = 0.10
     psi_critical: float = 0.25
-    effect_size: float = 0.10  # D do KS (numericas) ou V de Cramer (categoricas)
+    effect_size: float = 0.10  # D do KS (numericas) ou TVD (categoricas)
     alpha: float = 0.05
     drift_share: float = 0.30
 
@@ -33,7 +33,7 @@ class FeatureDrift:
     model_input: bool
     psi: float
     test: str  # "ks" | "chi2"
-    statistic: float  # D do KS ou V de Cramer
+    statistic: float  # D do KS ou TVD (distancia de variacao total)
     p_value: float
     reference_mean: float
     current_mean: float

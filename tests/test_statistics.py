@@ -87,14 +87,22 @@ def test_ks_test_separates_shifted_from_equal_distributions(rng):
     assert shifted.statistic > 0.15
 
 
-def test_chi_square_reports_cramers_v_between_zero_and_one():
+def test_chi_square_reports_total_variation_distance():
     reference = pd.Series([0] * 800 + [1] * 200)
     same = chi_square_test(reference, reference)
     different = chi_square_test(reference, pd.Series([0] * 200 + [1] * 800))
     assert same.statistic == pytest.approx(0.0, abs=1e-9)
     assert same.p_value == pytest.approx(1.0)
-    assert 0.5 < different.statistic <= 1.0
+    assert different.statistic == pytest.approx(0.6)  # 60% da carteira mudou de categoria
     assert different.p_value < 1e-10
+
+
+@pytest.mark.parametrize(("n_reference", "n_current"), [(1000, 1000), (15_000, 2000), (15_000, 1000), (3000, 30_000)])
+def test_categorical_effect_size_does_not_depend_on_sample_sizes(n_reference, n_current):
+    """A mesma mudanca de proporcao (20% -> 35%) tem de dar o mesmo efeito com qualquer tamanho de lote."""
+    reference = pd.Series([1] * int(0.20 * n_reference) + [0] * int(0.80 * n_reference))
+    current = pd.Series([1] * int(0.35 * n_current) + [0] * int(0.65 * n_current))
+    assert chi_square_test(reference, current).statistic == pytest.approx(0.15, abs=1e-9)
 
 
 def test_chi_square_with_a_single_category_is_not_significant():

@@ -2,8 +2,12 @@
 
 O Evidently gera o relatorio HTML navegavel (distribuicoes lado a lado, teste por coluna) e um
 veredito independente do detector proprio (``creditwatch.drift.detector``). Os dois usam PSI com
-os mesmos limiares; divergencias pontuais vem apenas da forma de montar as faixas e servem de
-contraprova. Quando o lote ja tem rotulo, o relatorio inclui a qualidade da classificacao.
+os mesmos limiares, mas nao chegam ao mesmo numero, por dois motivos: o Evidently monta as faixas
+do PSI de outra forma, e aqui ele compara o lote com as particoes de validacao e teste da
+referencia (fora do treino, para que o score e a qualidade da classificacao sejam honestos),
+enquanto o detector proprio compara as features com a referencia inteira. O que se espera e que
+os dois concordem sobre *quais* features mudaram, nao sobre o valor do PSI. Quando o lote ja tem
+rotulo, o relatorio inclui a qualidade da classificacao.
 """
 
 from __future__ import annotations
