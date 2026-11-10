@@ -35,6 +35,8 @@ AGE_BANDS = ((18, 29, "18-29"), (30, 39, "30-39"), (40, 49, "40-49"), (50, 120, 
 ATTRIBUTES = ("sex", "age_band", "education", "marriage")
 MIN_GROUP_SIZE = 100
 MIN_GROUP_SHARE = 0.02
+Z_95 = 1.959964
+ADVERSE, INCONCLUSIVE, WITHIN_LIMIT = "impacto adverso", "inconclusivo", "dentro do limite"
 
 
 def age_band(age: pd.Series) -> pd.Series:
@@ -63,37 +65,69 @@ def minimum_group_size(n_rows: int) -> int:
     return max(MIN_GROUP_SIZE, int(MIN_GROUP_SHARE * n_rows))
 
 
+def ratio_confidence_interval(p_group: float, n_group: int, p_best: float, n_best: int) -> tuple[float, float]:
+    """Intervalo de 95% para a razao entre duas taxas de aprovacao (metodo do logaritmo).
+
+    Trata os dois grupos como amostras independentes. Nos periodos de producao o mesmo cliente do
+    pool pode aparecer em mais de um mes, entao o intervalo real e um pouco mais largo.
+    """
+    if min(p_group, p_best) <= 0 or min(n_group, n_best) <= 0:
+        return float("nan"), float("nan")
+    ratio = p_group / p_best
+    std_error = np.sqrt((1 - p_group) / (n_group * p_group) + (1 - p_best) / (n_best * p_best))
+    return float(ratio * np.exp(-Z_95 * std_error)), float(ratio * np.exp(Z_95 * std_error))
+
+
+def _verdict(ratio: float, ci_low: float) -> str:
+    if ratio < FOUR_FIFTHS:
+        return ADVERSE
+    return WITHIN_LIMIT if ci_low >= FOUR_FIFTHS else INCONCLUSIVE
+
+
 def group_metrics(frame: pd.DataFrame, attribute: str) -> list[dict]:
-    """Metricas de decisao por grupo de ``attribute``; grupos abaixo de ``minimum_group_size`` sao omitidos."""
+    """Metricas de decisao por grupo de ``attribute``.
+
+    Grupos abaixo de ``minimum_group_size`` continuam na saida, marcados com ``compared=False``,
+    mas nao entram na comparacao nem podem ser o grupo de referencia.
+    """
     rows: list[dict] = []
     minimum = minimum_group_size(len(frame))
     for group, part in frame.groupby(attribute, sort=True):
-        if len(part) < minimum:
-            continue
         good = part[part[TARGET] == 0]
         rows.append(
             {
                 "attribute": attribute,
                 "group": str(group),
                 "n": len(part),
+                "compared": len(part) >= minimum,
                 "approval_rate": float(part[DECISION].mean()),
                 "approval_rate_good_payers": float(good[DECISION].mean()) if len(good) else float("nan"),
                 "default_rate": float(part[TARGET].mean()),
                 "mean_score": float(part[SCORE].mean()),
             }
         )
-    if rows:
-        best = max(row["approval_rate"] for row in rows)
-        best_good = max(row["approval_rate_good_payers"] for row in rows)
-        for row in rows:
-            row["disparate_impact"] = row["approval_rate"] / best if best else float("nan")
-            row["equal_opportunity_gap"] = best_good - row["approval_rate_good_payers"]
-            row["adverse_impact"] = bool(row["disparate_impact"] < FOUR_FIFTHS)
+    compared = [row for row in rows if row["compared"]]
+    if compared:
+        best = max(compared, key=lambda row: row["approval_rate"])
+        best_good = np.nanmax([row["approval_rate_good_payers"] for row in compared])
+        for row in compared:
+            ratio = row["approval_rate"] / best["approval_rate"] if best["approval_rate"] else float("nan")
+            if row is best:
+                ci_low = ci_high = 1.0
+            else:
+                ci_low, ci_high = ratio_confidence_interval(
+                    row["approval_rate"], row["n"], best["approval_rate"], best["n"]
+                )
+            row["disparate_impact"] = ratio
+            row["disparate_impact_ci"] = [ci_low, ci_high]
+            row["equal_opportunity_gap"] = float(best_good - row["approval_rate_good_payers"])
+            row["adverse_impact"] = bool(ratio < FOUR_FIFTHS)
+            row["verdict"] = _verdict(ratio, ci_low)
     return rows
 
 
 def fairness_audit(periods: dict[str, pd.DataFrame]) -> dict:
-    """Auditoria por periodo e atributo, com o resumo dos grupos em impacto adverso."""
+    """Auditoria por periodo e atributo, com o resumo do grupo menos aprovado de cada atributo."""
     by_period: dict[str, list[dict]] = {}
     for period, frame in periods.items():
         labeled = with_group_labels(frame)
@@ -102,7 +136,7 @@ def fairness_audit(periods: dict[str, pd.DataFrame]) -> dict:
     worst: list[dict] = []
     for period, rows in by_period.items():
         for attribute in ATTRIBUTES:
-            candidates = [row for row in rows if row["attribute"] == attribute]
+            candidates = [row for row in rows if row["attribute"] == attribute and row["compared"]]
             if candidates:
                 lowest = min(candidates, key=lambda row: row["disparate_impact"])
                 worst.append(
@@ -110,15 +144,27 @@ def fairness_audit(periods: dict[str, pd.DataFrame]) -> dict:
                         "period": period,
                         "attribute": attribute,
                         "group": lowest["group"],
+                        "n": lowest["n"],
                         "disparate_impact": round(lowest["disparate_impact"], 4),
+                        "disparate_impact_ci": [round(value, 4) for value in lowest["disparate_impact_ci"]],
                         "equal_opportunity_gap": round(lowest["equal_opportunity_gap"], 4),
                         "adverse_impact": lowest["adverse_impact"],
+                        "verdict": lowest["verdict"],
                     }
                 )
+    compared = [{"period": period, **row} for period, rows in by_period.items() for row in rows if row["compared"]]
+    largest_gap = max(compared, key=lambda row: row["equal_opportunity_gap"]) if compared else None
     return {
         "four_fifths_threshold": FOUR_FIFTHS,
         "minimum_group_size": {period: minimum_group_size(len(frame)) for period, frame in periods.items()},
         "attributes": list(ATTRIBUTES),
+        "largest_equal_opportunity_gap": largest_gap
+        and {
+            "period": largest_gap["period"],
+            "attribute": largest_gap["attribute"],
+            "group": largest_gap["group"],
+            "equal_opportunity_gap": round(largest_gap["equal_opportunity_gap"], 4),
+        },
         "worst_groups": worst,
         "by_period": by_period,
     }
