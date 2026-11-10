@@ -87,6 +87,7 @@ def _stage_stats(events: list[dict]) -> list[dict]:
                 "blocked": sum(item["status"] == "blocked" for item in items),
                 "failed": sum(item["status"] == "failed" for item in items),
                 "median_ms": round(statistics.median(durations), 1),
+                "cpu_ms": round(sum(item.get("cpu_ms") or 0 for item in items), 1),
                 "max_ms": round(max(durations), 1),
                 "rows": sum(item.get("rows_out") or 0 for item in items),
             }
@@ -113,7 +114,13 @@ def build_payload(settings: Settings) -> dict:
 
     timeline = pd.read_csv(monitoring / "timeline.csv")
     scored = timeline[timeline["status"] == "scored"].reset_index(drop=True)
+    if scored.empty:
+        raise ValueError("nenhuma remessa escorada: nao ha o que mostrar no dashboard")
     months = scored["month"].tolist()
+    if len(set(months)) != len(months):
+        raise ValueError("ha mais de uma remessa escorada no mesmo mes; o dashboard espera uma por mes")
+    # Sem rotulo maduro em nenhuma remessa, as colunas de performance nem existem na serie temporal.
+    scored = scored.reindex(columns=[*scored.columns, *(f for f in TIMELINE_FIELDS if f not in scored.columns)])
     batches = {path.stem: _read_json(path) for path in sorted((monitoring / "batches").glob("*.json"))}
     events = _latest_run(read_events(settings.events_path), "monitor")
 
@@ -197,6 +204,8 @@ def build_payload(settings: Settings) -> dict:
         "analysis": {
             "causal": causal,
             "segments": (diagnosis or {}).get("segments"),
+            "utilization_cut": (diagnosis or {}).get("utilization_cut"),
+            "scan": ((diagnosis or {}).get("calibration_scan") or {}).get("by_feature", [])[:6],
             "ranking": (diagnosis or {}).get("root_cause_ranking"),
             "fairness": (fairness or {}).get("worst_groups"),
             "remediation": remediation,

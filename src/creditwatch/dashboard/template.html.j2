@@ -80,6 +80,8 @@ table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
 th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
 th { color: var(--ink-2); font-weight: 600; white-space: nowrap; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td:first-child { min-width: 7.5em; }
+td:last-child, th:last-child { padding-right: 0; }
 .status { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 .dot.ok { background: var(--good); } .dot.warning { background: var(--warning); border-radius: 2px; }
@@ -137,15 +139,16 @@ footer { color: var(--muted); font-size: 12.5px; margin-top: 40px; }
 
   <section id="analysis-section">
     <h2 id="causa">Causa da degradação</h2>
-    <p class="note">Cada mecanismo do cenário foi ligado e desligado isoladamente; a variação de AUC é repartida entre eles por valores de Shapley. Barras à esquerda derrubam o modelo.</p>
+    <p class="note">Cada mecanismo do cenário foi ligado e desligado isoladamente; a variação de AUC é repartida entre eles por valores de Shapley. Barras à esquerda derrubam o modelo. Em produção não dá para desligar a inflação: a varredura de calibração é o que se consegue fazer só com os dados.</p>
     <div class="grid cols-2">
       <article class="card"><h3>Contribuição de cada mecanismo para a variação do ROC AUC</h3><p class="sub" id="causal-sub"></p><div class="chart" id="chart-causal"></div></article>
-      <article class="card"><h3>Inadimplência observada × prevista por segmento</h3><p class="sub">Um segmento em que a observada descola da prevista é a assinatura de drift de conceito.</p><div class="table-wrap" id="segments"></div></article>
+      <article class="card"><h3>Onde procurar: varredura de calibração</h3><p class="sub">Para cada feature, quanto o erro (observada − prevista) cresceu a mais em uma faixa do que em outra, em relação à referência. Faixas são categorias ou quartis da referência.</p><div class="table-wrap" id="scan"></div></article>
     </div>
     <div class="grid cols-2" style="margin-top:12px">
-      <article class="card"><h3>Remediação testada em meses posteriores</h3><p class="sub" id="remediation-sub"></p><div class="table-wrap" id="remediation"></div></article>
-      <article class="card"><h3>Auditoria de viés</h3><p class="sub">Grupo menos aprovado de cada atributo protegido. Impacto desigual abaixo de 0,80 indica impacto adverso (regra dos quatro quintos).</p><div class="table-wrap" id="fairness"></div></article>
+      <article class="card"><h3>Inadimplência observada × prevista por segmento</h3><p class="sub" id="segments-sub"></p><div class="table-wrap" id="segments"></div></article>
+      <article class="card"><h3>Remediação: backtest em meses posteriores</h3><p class="sub" id="remediation-sub"></p><div class="table-wrap" id="remediation"></div></article>
     </div>
+    <article class="card" style="margin-top:12px"><h3>Auditoria de viés</h3><p class="sub">Grupo menos aprovado de cada atributo protegido. Impacto desigual é a taxa de aprovação do grupo dividida pela do grupo mais aprovado; abaixo de 0,80 indica impacto adverso (regra dos quatro quintos) e, se só o intervalo de 95% cruza 0,80, o resultado é inconclusivo.</p><div class="table-wrap" id="fairness"></div></article>
   </section>
 
   <h2 id="alertas">Todos os alertas</h2>
@@ -283,7 +286,8 @@ function frame(container, cfg) {
   });
   (cfg.refs || []).forEach((ref) => {
     sv("line", { x1: m.left, x2: width - m.right, y1: y(ref.value), y2: y(ref.value), stroke: "var(--muted)", "stroke-width": 1 }, svg);
-    sv("text", { x: width - m.right, y: y(ref.value) - 5, "text-anchor": "end", class: "strong" }, svg, ref.label);
+    // Rotulo a esquerda: as series comecam longe dos limiares e so os cruzam mais adiante.
+    sv("text", { x: m.left + 4, y: y(ref.value) - 5, "text-anchor": "start", class: "strong" }, svg, ref.label);
   });
   return { svg, x, y, m, width, height, plotW, plotH, step, n, lo };
 }
@@ -321,13 +325,15 @@ function lineChart(id, cfg) {
   const f = frame(container, Object.assign({ yMin: cfg.yMin ?? Math.min(...values), yMax: cfg.yMax ?? Math.max(...values) }, cfg));
   cfg.series.forEach((s) => {
     const points = s.values.map((v, i) => (v == null ? null : [f.x(i), f.y(v)])).filter(Boolean);
+    if (!points.length) return;  // serie sem nenhum valor (ex.: nenhum rotulo maduro ainda)
     sv("path", { d: "M" + points.map((p) => p.join(",")).join("L"), fill: "none", stroke: s.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, f.svg);
     const last = points[points.length - 1];
     sv("circle", { cx: last[0], cy: last[1], r: 4, fill: s.color, stroke: "var(--surface)", "stroke-width": 2 }, f.svg);
     if (cfg.series.length === 1) {
       // Rotulo do ultimo ponto do lado livre da linha: abaixo se ela vem descendo, acima se vem subindo.
       const falling = points.length > 1 && last[1] > points[points.length - 2][1];
-      sv("text", { x: last[0] - 6, y: last[1] + (falling ? 18 : -10), "text-anchor": "end", class: "strong" }, f.svg, cfg.fmt(s.values[s.values.length - 1]));
+      const lastValue = s.values.filter((v) => v != null).pop();
+      sv("text", { x: last[0] - 6, y: last[1] + (falling ? 18 : -10), "text-anchor": "end", class: "strong" }, f.svg, cfg.fmt(lastValue));
     }
   });
   hover(container, f, (i) => ({
@@ -394,7 +400,7 @@ function heatmap(id, features) {
         cell.setAttribute("stroke", "var(--ink)");
         tip.show((labelW + (i + 0.5) * cellW) * (container.clientWidth / width), y0, name + " · " + monthLabel(month), [
           { value: F.d3(detail.psi), name: "PSI (" + SEVERITY[detail.severity].toLowerCase() + ")" },
-          { value: F.d3(detail.statistic), name: detail.test === "ks" ? "D de Kolmogorov-Smirnov" : "V de Cramér (qui-quadrado)" },
+          { value: F.d3(detail.statistic), name: detail.test === "ks" ? "D de Kolmogorov-Smirnov" : "variação total (qui-quadrado)" },
           { value: F.p(detail.p_value), name: "p-valor" },
         ]);
       };
@@ -436,7 +442,8 @@ function divergingBars(id, rows, fmt) {
 
 /* ---------- Conteudo ---------- */
 const T = D.timeline, last = D.months.length - 1, ref = D.reference, ov = D.overview;
-const stableEnd = D.phases[0].end;
+// Ultimo mes com rotulo maduro (-1 se nenhum): as metricas de performance so existem ate ele.
+const labeled = T.roc_auc.reduce((found, value, index) => (value == null ? found : index), -1);
 
 (function header() {
   const meta = document.getElementById("meta");
@@ -447,23 +454,27 @@ const stableEnd = D.phases[0].end;
     const item = el("span", {}, meta); el("span", {}, item, k + ": "); el("b", {}, item, v);
   });
   const banner = document.getElementById("banner");
-  const drop = ref.roc_auc - T.roc_auc[last];
-  const level = drop >= D.thresholds.auc_drop_critical ? "critical" : ov.alerts.critical ? "warning" : "ok";
+  // Sem rotulo maduro nao ha queda medida: o banner nunca trata ausencia de dado como degradacao.
+  const drop = labeled < 0 ? null : ref.roc_auc - T.roc_auc[labeled];
+  const level = drop != null && drop >= D.thresholds.auc_drop_critical ? "critical" : ov.alerts.critical ? "warning" : "ok";
   status(banner, level, "");
   const text = el("div", {}, banner);
-  el("strong", {}, text, level === "critical" ? "Modelo degradado: ação necessária" : level === "warning" ? "Drift detectado: modelo em observação" : "Modelo estável");
+  el("strong", {}, text, level === "critical" ? "Modelo degradado: ação necessária" : level === "warning" ? "Alertas críticos no período: modelo em observação" : "Modelo estável");
+  const performance = labeled < 0
+    ? ". Nenhuma remessa tem rótulo maduro ainda; a performance do modelo não pôde ser medida."
+    : ". O ROC AUC foi de " + F.d3(ref.roc_auc) + " na referência para " + F.d3(T.roc_auc[labeled]) + " em " + monthLabel(D.months[labeled]) +
+      " e a inadimplência entre os aprovados, de " + F.pct(ref.bad_rate_approved) + " para " + F.pct(T.bad_rate_approved[labeled]) + ".";
   el("span", { class: "lede" }, text,
     "Primeiro alerta de drift de dados em " + (ov.first_drift_alert ? monthLabel(ov.first_drift_alert) : "–") +
-    "; primeira queda de performance em " + (ov.first_performance_alert ? monthLabel(ov.first_performance_alert) : "–") +
-    ". O ROC AUC foi de " + F.d3(ref.roc_auc) + " na referência para " + F.d3(T.roc_auc[last]) + " em " + monthLabel(D.months[last]) +
-    " e a inadimplência entre os aprovados, de " + F.pct(ref.bad_rate_approved) + " para " + F.pct(T.bad_rate_approved[last]) + ".");
+    "; primeira queda de performance em " + (ov.first_performance_alert ? monthLabel(ov.first_performance_alert) : "–") + performance);
 })();
 
 (function tiles() {
   const lastDetail = D.features.detail[D.months[last]];
+  const labeledMonth = labeled < 0 ? "sem rótulo maduro" : "em " + monthLabel(D.months[labeled]);
   const tiles = [
-    ["ROC AUC no último mês", F.d3(T.roc_auc[last]), "referência " + F.d3(ref.roc_auc)],
-    ["Inadimplência entre aprovados", F.pct(T.bad_rate_approved[last]), "referência " + F.pct(ref.bad_rate_approved)],
+    ["ROC AUC " + labeledMonth, labeled < 0 ? "–" : F.d3(T.roc_auc[labeled]), "referência " + F.d3(ref.roc_auc)],
+    ["Inadimplência entre aprovados", labeled < 0 ? "–" : F.pct(T.bad_rate_approved[labeled]), "referência " + F.pct(ref.bad_rate_approved)],
     ["Features com drift", F.int(T.n_drifted[last]) + " de " + lastDetail.length, F.int(T.n_critical[last]) + " críticas no último mês"],
     ["Alertas no período", F.int(ov.alerts.total), F.int(ov.alerts.critical) + " críticos · " + F.int(ov.alerts.warning) + " de atenção"],
     ["Remessas processadas", F.int(ov.deliveries), F.int(ov.blocked) + " bloqueada(s) pelo contrato"],
@@ -514,11 +525,12 @@ function drawCharts() {
   if (D.analysis.causal) {
     const c = D.analysis.causal;
     document.getElementById("causal-sub").textContent =
-      "Efeito total no cenário de " + monthLabel(c.plan.month) + ": " + F.signed3(c.total_effect.roc_auc) + " de ROC AUC.";
+      "Efeito total no cenário de " + monthLabel(c.plan.month) + ": " + F.signed3(c.total_effect.roc_auc) + " de ROC AUC (média de " +
+      c.seeds.length + " seeds, lotes de " + F.int(c.sample_size) + " propostas).";
     divergingBars("chart-causal", c.mechanisms.map((name) => ({
       label: c.mechanism_labels[name].split(" (")[0], value: c.shapley.roc_auc[name],
       tip: [
-        { value: F.signed3(c.shapley.roc_auc[name]), name: "ROC AUC (Shapley)" },
+        { value: F.signed3(c.shapley.roc_auc[name]) + " ± " + F.d3(c.shapley_std.roc_auc[name]), name: "ROC AUC (Shapley, média ± desvio)" },
         { value: F.signed3(c.single[name].roc_auc), name: "ROC AUC com o mecanismo isolado" },
         { value: F.signed3(c.shapley.bad_rate_approved[name]), name: "inadimplência entre aprovados" },
         { value: F.d1(c.shapley.n_drifted[name]), name: "features com drift" },
@@ -622,24 +634,38 @@ function drawMonth(month) {
     { label: "Prevista", num: true, value: (s) => F.pct(s.predicted_default_rate) },
     { label: "Diferença", num: true, value: (s) => (s.gap > 0 ? "+" : s.gap < 0 ? "−" : "") + nf(1).format(Math.abs(s.gap) * 100) + " p.p." },
   ], A.segments.filter((s) => s.period === "referencia" || s.period === D.phases[D.phases.length - 1].phase));
-  const R = A.remediation, names = { campeao: "Manter o modelo atual", retreino_janela_recente: "Retreinar com a janela recente", retreino_referencia_mais_producao: "Retreinar com referência + produção" };
-  document.getElementById("remediation-sub").textContent =
-    "Treino com rótulos maduros até " + monthLabel(R.train_months[R.train_months.length - 1]) + "; teste em " + R.test_months.map(monthLabel).join(" e ") + ".";
-  table(document.getElementById("remediation"), [
-    { label: "Estratégia", value: (k) => names[k] || k },
-    { label: "ROC AUC", num: true, value: (k) => F.d3(R.strategies[k].roc_auc) },
-    { label: "KS", num: true, value: (k) => F.d3(R.strategies[k].ks) },
-    { label: "Aprovação", num: true, value: (k) => F.pct(R.strategies[k].approval_rate) },
-    { label: "Inadimpl. aprovados", num: true, value: (k) => F.pct(R.strategies[k].bad_rate_approved) },
-  ], Object.keys(R.strategies));
+  document.getElementById("segments-sub").textContent =
+    "Segmentos montados com as variáveis que a varredura aponta; utilização cortada na mediana da referência (" + F.d2(A.utilization_cut) + ").";
+  table(document.getElementById("scan"), [
+    { label: "Feature", value: (s) => s.feature },
+    { label: "Dispersão do excesso", num: true, value: (s) => nf(1).format(s.spread * 100) + " p.p." },
+    { label: "Valor ou faixa mais afetada", value: (s) => s.worst_bin },
+    { label: "Excesso na faixa", num: true, value: (s) => (s.worst_excess_gap > 0 ? "+" : "−") + nf(1).format(Math.abs(s.worst_excess_gap) * 100) + " p.p." },
+    { label: "Carteira", num: true, value: (s) => F.pct(s.worst_bin_share) },
+  ], A.scan);
+  const R = A.remediation;
+  if (R) {
+    document.getElementById("remediation-sub").textContent =
+      "Ajuste com os rótulos que estariam maduros (até " + monthLabel(R.train_months[R.train_months.length - 1]) + "); teste em " +
+      R.test_months.map(monthLabel).join(" e ") + ", com clientes que não aparecem no ajuste. Aprovação: no ponto de corte de cada estratégia. Última coluna: inadimplência entre aprovados quando todas aprovam o mesmo volume (" +
+      F.pct(R.champion_approval_rate) + ").";
+    table(document.getElementById("remediation"), [
+      { label: "Estratégia", value: (k) => (R.strategy_labels || {})[k] || k },
+      { label: "ROC AUC", num: true, value: (k) => F.d3(R.strategies[k].roc_auc) },
+      { label: "KS", num: true, value: (k) => F.d3(R.strategies[k].ks) },
+      { label: "Aprovação", num: true, value: (k) => F.pct(R.strategies[k].approval_rate) },
+      { label: "Inadimpl. (mesmo volume)", num: true, value: (k) => F.pct(R.strategies[k].bad_rate_at_champion_approval) },
+    ], Object.keys(R.strategies));
+  }
   const attr = { sex: "Sexo", age_band: "Faixa etária", education: "Escolaridade", marriage: "Estado civil" };
+  const verdict = { "impacto adverso": ["critical", "Impacto adverso"], "inconclusivo": ["warning", "Inconclusivo"], "dentro do limite": ["ok", "Dentro do limite"] };
   table(document.getElementById("fairness"), [
     { label: "Período", value: (f) => D.phase_labels[f.period] || f.period },
     { label: "Atributo", value: (f) => attr[f.attribute] || f.attribute },
-    { label: "Grupo menos aprovado", value: (f) => f.group },
-    { label: "Impacto desigual", num: true, value: (f) => F.d2(f.disparate_impact) },
-    { label: "Situação", value: (f) => { const s = document.createElement("span"); status(s, f.adverse_impact ? "critical" : "ok", f.adverse_impact ? "Impacto adverso" : "Dentro do limite"); return s; } },
-  ], A.fairness);
+    { label: "Grupo menos aprovado", value: (f) => f.group + " (n = " + F.int(f.n) + ")" },
+    { label: "Impacto desigual (IC 95%)", num: true, value: (f) => F.d2(f.disparate_impact) + " (" + F.d2(f.disparate_impact_ci[0]) + " a " + F.d2(f.disparate_impact_ci[1]) + ")" },
+    { label: "Situação", value: (f) => { const s = document.createElement("span"), v = verdict[f.verdict] || ["ok", f.verdict]; status(s, v[0], v[1]); return s; } },
+  ], A.fairness || []);
 })();
 
 table(document.getElementById("all-alerts"), alertColumns(true), D.alerts);
