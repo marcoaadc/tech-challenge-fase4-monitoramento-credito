@@ -77,6 +77,21 @@ def data_quality_alert(batch: str, delivery: str, violated_rules: list[str], n_r
     )
 
 
+def label_quality_alert(batch: str, delivery: str, problem: str) -> Alert:
+    """O arquivo de rotulos de uma remessa foi rejeitado: a performance dela fica indisponivel."""
+    return Alert(
+        batch=batch,
+        kind=DATA_QUALITY,
+        severity=WARNING,
+        title="Arquivo de rótulos rejeitado",
+        detail=f"Remessa {delivery}: {problem}. A performance desta remessa não foi calculada.",
+        metric="label_file_rejected",
+        value=1.0,
+        threshold=0.0,
+        detectable_at=batch,
+    )
+
+
 def drift_alerts(batch: str, report: DriftReport) -> list[Alert]:
     """Alerta de drift de entrada: no maximo um por lote, para nao gerar fadiga de alertas.
 

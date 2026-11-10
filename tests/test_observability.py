@@ -8,7 +8,8 @@ import pytest
 from creditwatch.observability.events import BLOCKED, FAILED, SUCCESS, StageBlocked, StageTracker, read_events
 from creditwatch.observability.logs import LOG_FILENAME, configure_logging, current_run_id, new_run_id, set_run_id
 from creditwatch.observability.prometheus import PipelineMetrics
-from creditwatch.observability.tracking import Tracker, _clean_metrics
+from creditwatch.observability.tracking import Tracker, _clean_metrics, export_tracking_summary
+from creditwatch.pipelines.run_all import export_run_log
 
 
 def test_run_id_is_unique_and_propagated():
@@ -60,6 +61,7 @@ def test_stage_tracker_records_success_with_duration_and_rows(tmp_path):
     assert stored[0]["run_id"] == "run-1"
     assert (stored[0]["rows_in"], stored[0]["rows_out"]) == (2000, 1990)
     assert stored[0]["duration_ms"] >= 0
+    assert stored[0]["cpu_ms"] >= 0  # tempo de CPU do estagio
     assert stored[0]["details"] == {"latency": 1.5}
 
 
@@ -135,6 +137,7 @@ def test_pipeline_metrics_export_in_prometheus_format(tmp_path):
     assert 'creditwatch_alerts_total{kind="data_drift",severity="critical"} 1.0' in text
     assert 'creditwatch_last_batch_info{batch="2025-08",model_version="v1"} 1.0' in text
     assert "creditwatch_stage_duration_seconds_bucket" in text
+    assert 'creditwatch_stage_cpu_seconds_total{stage="score"}' in text
     assert "_created" not in text
 
 
@@ -162,3 +165,27 @@ def test_clean_metrics_drops_non_finite_and_non_numeric_values():
         {"roc_auc": 0.7, "nan": float("nan"), "inf": float("inf"), "text": "2026-01", "flag": True, "psi/feature@1": 1}
     )
     assert cleaned == {"roc_auc": 0.7, "flag": 1.0, "psi/feature_1": 1.0}
+
+
+def test_tracking_summary_is_skipped_without_mlflow(tmp_path):
+    assert export_tracking_summary(None, ("experimento",), tmp_path / "summary.json") is None
+    assert not (tmp_path / "summary.json").exists()
+
+
+def test_run_log_export_keeps_only_the_lines_of_the_run(isolated_settings):
+    settings = isolated_settings
+    assert export_run_log(settings, "run-a") is None  # ainda nao ha log
+
+    configure_logging("INFO", settings.logs_dir)
+    set_run_id("run-a")
+    logging.getLogger("creditwatch.test").info("primeira execucao")
+    set_run_id("run-b")
+    logging.getLogger("creditwatch.test").info("segunda execucao")
+    set_run_id("run-a")
+    logging.getLogger("creditwatch.test").info("primeira execucao, de novo")
+
+    exported = export_run_log(settings, "run-a")
+    records = [json.loads(line) for line in exported.read_text(encoding="utf-8").splitlines()]
+    assert [record["message"] for record in records] == ["primeira execucao", "primeira execucao, de novo"]
+    assert {record["run_id"] for record in records} == {"run-a"}
+    assert exported == settings.observability_dir / "pipeline_log.jsonl"

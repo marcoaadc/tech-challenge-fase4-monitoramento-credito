@@ -10,6 +10,7 @@ testes nao dependem dele. Com a URI definida:
 
 from __future__ import annotations
 
+import json
 import logging
 import math
 import re
@@ -100,3 +101,50 @@ class Tracker:
             self._mlflow.xgboost.log_model(model, **common)
         else:
             self._mlflow.sklearn.log_model(model, pyfunc_predict_fn="predict_proba", **common)
+
+
+def export_tracking_summary(tracking_uri: str | None, experiments: tuple[str, ...], path: Path) -> Path | None:
+    """Grava um resumo do que esta no MLflow: experimentos, runs, contagem de metricas e modelos registrados.
+
+    O banco do MLflow nao e versionado; este arquivo e a evidencia versionada de que o
+    rastreamento aconteceu e do que ele contem. Sem ``tracking_uri`` nada e gravado.
+    """
+    if not tracking_uri:
+        return None
+    from mlflow.tracking import MlflowClient
+
+    client = MlflowClient(tracking_uri=tracking_uri)
+    summary: dict = {"tracking_uri": tracking_uri, "experiments": [], "registered_models": []}
+    for name in experiments:
+        experiment = client.get_experiment_by_name(name)
+        if experiment is None:
+            continue
+        runs = client.search_runs([experiment.experiment_id], order_by=["attributes.start_time ASC"])
+        summary["experiments"].append(
+            {
+                "name": name,
+                "runs": len(runs),
+                "parent_runs": sum("mlflow.parentRunId" not in run.data.tags for run in runs),
+                "items": [
+                    {
+                        "run_name": run.info.run_name,
+                        "nested": "mlflow.parentRunId" in run.data.tags,
+                        "status": run.info.status,
+                        "metrics": len(run.data.metrics),
+                        "params": len(run.data.params),
+                    }
+                    for run in runs
+                ],
+            }
+        )
+    for model in client.search_registered_models():
+        versions = client.search_model_versions(f"name='{model.name}'")
+        summary["registered_models"].append(
+            {"name": model.name, "versions": sorted(int(version.version) for version in versions)}
+        )
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(summary, indent=2, ensure_ascii=False) + "\n"
+    path.write_text(payload, encoding="utf-8", newline="\n")
+    logger.info("resumo do rastreamento MLflow gravado em %s", path)
+    return path

@@ -36,6 +36,7 @@ class StageEvent:
     status: str = SUCCESS
     started_at: str = ""
     duration_ms: float = 0.0
+    cpu_ms: float = 0.0  # tempo de CPU do processo no estagio (uso de recurso, nao tempo de espera)
     rows_in: int | None = None
     rows_out: int | None = None
     error: str | None = None
@@ -71,7 +72,7 @@ class StageTracker:
             started_at=datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
             rows_in=rows_in,
         )
-        started = time.perf_counter()
+        started, cpu_started = time.perf_counter(), time.process_time()
         try:
             yield event
         except StageBlocked as blocked:
@@ -83,6 +84,7 @@ class StageTracker:
             raise
         finally:
             event.duration_ms = round((time.perf_counter() - started) * 1000, 2)
+            event.cpu_ms = round((time.process_time() - cpu_started) * 1000, 2)
             self._record(event)
 
     def _record(self, event: StageEvent) -> None:
@@ -106,6 +108,7 @@ class StageTracker:
                 "batch": event.batch,
                 "status": event.status,
                 "duration_ms": event.duration_ms,
+                "cpu_ms": event.cpu_ms,
                 "rows_in": event.rows_in,
                 "rows_out": event.rows_out,
             },
@@ -122,6 +125,7 @@ class StageTracker:
             "stages": len(self.events),
             **by_status,
             "duration_ms": round(sum(event.duration_ms for event in self.events), 2),
+            "cpu_ms": round(sum(event.cpu_ms for event in self.events), 2),
         }
 
 

@@ -51,6 +51,9 @@ class PipelineMetrics:
             buckets=DURATION_BUCKETS,
             registry=r,
         )
+        self.stage_cpu = Counter(
+            "creditwatch_stage_cpu_seconds_total", "Tempo de CPU consumido por estagio.", ["stage"], registry=r
+        )
         self.rows = Counter("creditwatch_rows_total", "Linhas processadas por destino.", ["outcome"], registry=r)
         self.batches = Counter("creditwatch_batches_total", "Lotes processados por resultado.", ["status"], registry=r)
         self.contract_violations = Counter(
@@ -69,13 +72,25 @@ class PipelineMetrics:
         self.drift_share = Gauge("creditwatch_drift_share", "Fracao de features com drift no ultimo lote.", registry=r)
         self.score_psi = Gauge("creditwatch_score_psi", "PSI do score (drift de predicao) no ultimo lote.", registry=r)
         self.approval_rate = Gauge("creditwatch_approval_rate", "Taxa de aprovacao no ultimo lote.", registry=r)
-        self.model_auc = Gauge("creditwatch_model_roc_auc", "ROC AUC no ultimo lote com rotulo maduro.", registry=r)
-        self.model_ks = Gauge("creditwatch_model_ks", "KS do modelo no ultimo lote com rotulo maduro.", registry=r)
+        self.model_auc = Gauge(
+            "creditwatch_model_roc_auc",
+            "ROC AUC do ultimo lote escorado (so conhecido apos a maturacao do rotulo).",
+            registry=r,
+        )
+        self.model_ks = Gauge(
+            "creditwatch_model_ks",
+            "KS do modelo no ultimo lote escorado (so conhecido apos a maturacao do rotulo).",
+            registry=r,
+        )
         self.default_rate = Gauge(
-            "creditwatch_default_rate", "Taxa de inadimplencia no ultimo lote com rotulo maduro.", registry=r
+            "creditwatch_default_rate",
+            "Taxa de inadimplencia do ultimo lote escorado (apos a maturacao do rotulo).",
+            registry=r,
         )
         self.bad_rate_approved = Gauge(
-            "creditwatch_bad_rate_approved", "Inadimplencia entre os aprovados no ultimo lote com rotulo.", registry=r
+            "creditwatch_bad_rate_approved",
+            "Inadimplencia entre os aprovados do ultimo lote escorado (apos a maturacao).",
+            registry=r,
         )
         self.last_batch = Gauge(
             "creditwatch_last_batch_info",
@@ -91,6 +106,7 @@ class PipelineMetrics:
     def observe_stage(self, event: StageEvent) -> None:
         self.stage_runs.labels(stage=event.stage, status=event.status).inc()
         self.stage_duration.labels(stage=event.stage).observe(event.duration_ms / 1000)
+        self.stage_cpu.labels(stage=event.stage).inc(event.cpu_ms / 1000)
 
     def observe_batch(self, summary: dict, model_version: str) -> None:
         """Atualiza as series a partir do resumo de um lote (ver ``pipelines.monitor``)."""

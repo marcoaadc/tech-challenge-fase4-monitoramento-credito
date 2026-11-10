@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from creditwatch.data.schema import SCORE, TARGET
@@ -10,7 +12,7 @@ from creditwatch.drift import evidently_report
 from creditwatch.drift.detector import detect_drift
 from creditwatch.features.engineering import add_engineered_features, model_matrix
 from creditwatch.model.training import build_candidate
-from creditwatch.observability.tracking import Tracker
+from creditwatch.observability.tracking import Tracker, export_tracking_summary
 from creditwatch.simulation.scenario import default_scenario, generate_batch
 
 
@@ -85,6 +87,19 @@ def test_mlflow_tracker_logs_runs_metrics_and_artifacts(tmp_path, monkeypatch):
     assert child_run.data.tags["mlflow.parentRunId"] == parent.info.run_id
     assert child_run.data.tags["phase"] == "drift_de_conceito"
     assert {item.path for item in client.list_artifacts(child.info.run_id)} == {"summary.json", "payload.json"}
+
+    # O resumo versionavel descreve o que esta no banco do MLflow (que fica fora do repositorio).
+    exported = export_tracking_summary(uri, ("creditwatch-teste", "inexistente"), tmp_path / "obs" / "mlflow.json")
+    summary = json.loads(exported.read_text(encoding="utf-8"))
+    experiment = summary["experiments"][0]
+    assert [item["name"] for item in summary["experiments"]] == ["creditwatch-teste"]
+    assert (experiment["runs"], experiment["parent_runs"]) == (2, 1)
+    assert [(item["run_name"], item["nested"]) for item in experiment["items"]] == [
+        ("monitoramento", False),
+        ("2025-12", True),
+    ]
+    assert experiment["items"][0]["metrics"] == 1
+    assert summary["registered_models"] == []
     mlflow.set_tracking_uri(None)
 
 
