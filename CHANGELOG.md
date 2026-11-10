@@ -2,6 +2,11 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); versionamento [SemVer](https://semver.org/lang/pt-BR/).
 
+## [1.1.1] - 2026-11-10
+
+### Adicionado
+- Figuras do MLflow geradas a partir do banco de rastreamento (`scripts/mlflow_figures.py`, `make mlflow-figures`): séries de ROC AUC, features em drift, PSI do score e alertas por remessa, e comparação dos candidatos do treino.
+
 ## [1.1.0] - 2026-11-05
 
 Revisão completa da entrega. Os números do cenário mudaram (nova amostragem) e uma conclusão mudou: retreinar **não** recupera a queda causada pelo drift de conceito.
