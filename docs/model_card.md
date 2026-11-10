@@ -15,7 +15,7 @@
 ## Uso pretendido
 
 - **Para que serve:** ordenar clientes de cartão de crédito por risco de inadimplência e apoiar a decisão de concessão ou manutenção de limite.
-- **Para que não serve:** decidir sozinho, sem canal de revisão humana; ser aplicado a outro produto, país ou período sem revalidação; servir de base para precificação individual.
+- **Para que não serve:** decidir sozinho, sem canal de revisão; ser aplicado a outro produto, país ou período sem revalidação; servir de base para precificação individual.
 - **Contexto deste repositório:** o modelo é propositalmente simples. O objeto do projeto é a camada de sustentação — contrato de dados, detecção de drift, observabilidade e governança — e não a maximização de AUC.
 
 ## Dados
@@ -36,7 +36,7 @@
 | Pagamentos (6 meses) | `pay_amt_1..6` |
 | Derivadas | `utilization_1`, `utilization_avg`, `payment_ratio_1`, `payment_ratio_avg`, `max_delay`, `months_delayed`, `bill_trend` |
 
-**Fora do modelo por decisão de governança:** `sex`, `age`, `marriage`, `education` ([ADR 004](adr/004-atributos-protegidos-fora-do-modelo.md)). Incluí-los não melhora o desempenho: ROC AUC de teste 0,7806 com eles contra 0,7809 sem (três seeds).
+**Fora do modelo por decisão de governança:** `sex`, `age`, `marriage`, `education` ([ADR 004](adr/004-atributos-protegidos-fora-do-modelo.md)). Incluí-los não melhora o desempenho: treinando o mesmo algoritmo em três seeds, o ROC AUC de teste é 0,7806 com eles e 0,7809 sem (na validação, 0,7782 e 0,7754).
 
 Importância (ganho): `max_delay` 26,5%, `pay_status_1` 19,0%, `months_delayed` 16,7%. O modelo depende sobretudo do histórico de atrasos — é por isso que o drift de conceito, que quebra a relação entre "estar em dia" e "pagar", o atinge tanto.
 
@@ -46,6 +46,8 @@ Importância (ganho): `max_delay` 26,5%, `pay_status_1` 19,0%, `months_delayed` 
 |---|---|---|
 | Regressão Logística | 0,760 | 0,400 |
 | **XGBoost** (selecionado) | **0,774** | **0,423** |
+
+A validação serve para escolher o modelo e o ponto de corte. As métricas abaixo são da partição de teste, que não participou de nenhuma escolha, e são a base de comparação de todo o monitoramento.
 
 | Métrica (teste, 2.997 clientes) | Valor |
 |---|---|
@@ -64,38 +66,42 @@ Hiperparâmetros: 300 árvores, profundidade 4, taxa de aprendizado 0,05, `subsa
 
 | Fase | Meses | ROC AUC | Inadimplência entre aprovados |
 |---|---|---|---|
-| Estável | jan–mar | 0,773 a 0,786 | 12,2% a 12,4% |
-| Drift de dados | abr–ago | 0,775 a 0,813 | 12,7% a 15,8% |
-| Drift de conceito | set–dez | 0,741 → 0,613 | 19,7% → 30,7% |
+| Estável | jan–mar | 0,772 a 0,778 | 12,3% a 13,5% |
+| Drift de dados | abr–ago | 0,774 a 0,812 | 13,1% a 15,3% |
+| Drift de conceito | set–dez | 0,755 → 0,595 | 20,2% → 31,0% |
 
-O modelo resiste ao drift de dados e degrada com o drift de conceito. Detalhes em [drift.md](drift.md) e na análise causal do README.
+No drift de dados a ordenação se mantém e a inadimplência entre aprovados sobe 3 pontos; no drift de conceito o modelo perde a maior parte do poder de separação. Detalhes em [drift.md](drift.md) e na análise causal do README.
+
+**Retreinar não devolve o desempenho.** No backtest sem vazamento ([README, seção 10.4](../README.md#104-o-que-a-remediação-consegue-backtest)), a melhor estratégia com os rótulos disponíveis leva o ROC AUC de 0,610 para 0,631, e um retreino com rótulos imediatos chegaria a 0,646.
 
 ## Equidade
 
-Auditoria por sexo, faixa etária, escolaridade e estado civil a cada execução ([`fairness_audit.json`](../reports/analysis/fairness_audit.json)). Razão de impacto desigual do grupo menos aprovado (1,00 = igual ao grupo mais aprovado; abaixo de 0,80 indica impacto adverso):
+Auditoria por sexo, faixa etária, escolaridade e estado civil a cada execução ([`fairness_audit.json`](../reports/analysis/fairness_audit.json)). Razão de impacto desigual do grupo menos aprovado, com intervalo de 95% (1,00 = igual ao grupo mais aprovado; abaixo de 0,80 indica impacto adverso pela regra dos quatro quintos, usada aqui como critério de triagem):
 
-| Atributo | Referência | Estável | Drift de dados | Drift de conceito |
-|---|---|---|---|---|
-| Sexo | 0,94 (masculino) | 0,96 | 0,94 | 0,91 |
-| Faixa etária | 0,95 (18–29) | 0,93 | 0,91 | 0,84 (50+) |
-| Escolaridade | 0,87 (ensino médio) | 0,86 | **0,83** (ensino médio) | 0,84 (graduação) |
-| Estado civil | 0,98 (casado) | 0,99 | 1,00 | 0,96 |
+| Atributo | Referência | Drift de dados | Drift de conceito |
+|---|---|---|---|
+| Sexo (masculino) | 0,94 (0,91 a 0,97) | 0,95 (0,92 a 0,98) | 0,91 (0,88 a 0,95) |
+| Faixa etária | 0,95 (0,92 a 0,98), 18–29 | 0,91 (0,88 a 0,94), 18–29 | 0,91 (0,82 a 1,01), 50+ |
+| Escolaridade (ensino médio) | 0,87 (0,83 a 0,92) | **0,83 (0,80 a 0,87)** | **0,82 (0,77 a 0,87)** |
+| Estado civil | 0,98 (0,95 a 1,01) | 1,00 (0,97 a 1,03) | 1,00 (0,96 a 1,04) |
 
-Nenhum grupo fica abaixo do limite em nenhum período, mas a disparidade por escolaridade existe desde a referência (0,87) e aumenta com o drift (0,83): tirar o atributo das entradas não impede que as variáveis financeiras o reflitam. Entre bons pagadores, a taxa de aprovação do grupo menos favorecido chega a ficar 10,7 pontos percentuais abaixo da do mais favorecido (graduação, no drift de conceito).
-
-Grupos com menos de 100 clientes ou de 2% da amostra do período não entram na comparação (a categoria "outros" de escolaridade e de estado civil), porque a taxa de aprovação de um grupo pequeno é ruidosa demais para servir de referência.
+- Nenhum grupo fica abaixo de 0,80 na estimativa pontual; para escolaridade, o intervalo cruza o limite nos dois períodos de drift e o resultado é inconclusivo.
+- Entre bons pagadores, o grupo "ensino médio" é aprovado 9,0 p.p. menos que o grupo mais favorecido na referência e 13,2 p.p. menos no drift de conceito. Tirar o atributo das entradas não impede que as variáveis financeiras o reflitam.
+- Grupos com menos de 100 clientes ou de 2% da amostra do período (a categoria "outros" de escolaridade e de estado civil) aparecem no relatório, marcados como fora da comparação: a taxa de um grupo pequeno é ruidosa demais para servir de referência.
+- Nenhuma técnica de mitigação foi aplicada; o plano está no README, seção 9.7.
 
 ## Limitações e riscos
 
 - **Dados antigos e de outro país.** Clientes de Taiwan em 2005; a relação entre comportamento e inadimplência não se transfere a outra carteira.
 - **Rótulo de curto prazo.** Inadimplência no mês seguinte; modelos de concessão costumam usar janelas de 6 a 12 meses.
-- **Viés de seleção.** A base só contém clientes já aprovados; o modelo não foi validado em quem foi negado.
-- **Drift simulado.** A produção é gerada por um cenário controlado. A detecção foi validada contra mecanismos conhecidos; em produção, as causas reais precisam ser investigadas ([runbook](runbook.md)).
+- **Viés de seleção.** A base só contém clientes que já têm cartão; o modelo não foi validado em quem foi negado.
+- **Drift simulado.** A produção é gerada por um cenário controlado, e as doze remessas são sorteadas do mesmo conjunto de clientes. A detecção foi validada contra mecanismos conhecidos; em produção, as causas reais precisam ser investigadas ([runbook](runbook.md)).
 - **Dependência do histórico de atrasos.** Três features concentram 62% da importância; uma mudança nessa relação derruba o modelo.
-- **Atraso de rótulo.** A degradação só é mensurável dois meses depois da decisão.
+- **Atraso de rótulo.** A degradação só é mensurável dois meses depois da decisão, e é esse atraso que limita qualquer remediação por modelo.
+- **Sem explicação por decisão.** A importância medida é global; informar ao titular os fatores de uma negativa específica não está implementado.
 
 ## Manutenção
 
 - Monitoramento a cada remessa: contrato, drift, score, performance e viés ([observabilidade.md](observabilidade.md)).
 - Critério de revisão: alerta crítico de performance (queda de ROC AUC ≥ 0,05) ou impacto adverso na auditoria de viés.
-- Retreino: avaliado como desafiante em meses posteriores ao treino antes de qualquer promoção ([runbook](runbook.md), seção 4).
+- Retreino: avaliado como desafiante em safras com rótulo maduro, sem clientes em comum com o teste, antes de qualquer promoção ([runbook](runbook.md), seção 4).

@@ -7,9 +7,9 @@ O que é observado, onde fica registrado e como consultar. A decisão de arquite
 ```
  estágios do pipeline ──▶ StageTracker ──▶ reports/observability/pipeline_events.jsonl  (1 evento por estágio)
  (ingest, train,             │
-  simulate, monitor,         ├─▶ logs/pipeline.jsonl          log estruturado, mesmo run_id em todos os estágios
+  simulate, monitor,         ├─▶ logs/pipeline.jsonl ──▶ reports/observability/pipeline_log.jsonl (log da execução)
   analyze, dashboard)        ├─▶ PipelineMetrics ──▶ metrics.prom (+ Pushgateway opcional)
-                             └─▶ MLflow            ──▶ experimentos de treino e de monitoramento
+                             └─▶ MLflow            ──▶ mlflow.db ──▶ reports/observability/mlflow_summary.json
 
  resumo de cada remessa ─▶ reports/monitoring/batches/<remessa>.json ─▶ timeline.csv · feature_drift.csv
                              └─▶ regras de alerta ─▶ reports/observability/alerts.jsonl
@@ -19,57 +19,66 @@ O que é observado, onde fica registrado e como consultar. A decisão de arquite
 
 Código em [`src/creditwatch/observability/`](../src/creditwatch/observability/) e [`src/creditwatch/dashboard/`](../src/creditwatch/dashboard/).
 
+**O que fica versionado.** `logs/` e `mlflow.db` são arquivos de trabalho e ficam fora do repositório. Ao fim de uma execução completa, o pipeline copia para `reports/observability/` o log daquela execução e um resumo do que foi gravado no MLflow: são evidências sem dados pessoais, e é isso que o repositório traz.
+
 ## 2. Logs centralizados
 
-Todos os estágios escrevem no mesmo arquivo `logs/pipeline.jsonl` (JSON Lines) e no console. Cada linha traz o `run_id` da execução, então uma execução inteira se reconstrói com um filtro:
+Todos os estágios escrevem no mesmo arquivo JSON Lines e no console. Cada linha traz o `run_id` da execução, então uma execução inteira se reconstrói com um filtro. Uma linha de [`pipeline_log.jsonl`](../reports/observability/pipeline_log.jsonl):
 
 ```json
-{"timestamp": "2026-11-05T23:28:46.485+00:00", "level": "INFO", "logger": "creditwatch.pipeline",
- "message": "estagio contract [2025-01]: success em 130 ms", "event": "stage_finished",
+{"timestamp": "2026-11-06T01:11:06.425+00:00", "level": "INFO", "logger": "creditwatch.pipeline",
+ "message": "estagio contract [2025-01]: success em 148 ms", "event": "stage_finished",
  "pipeline": "monitor", "stage": "contract", "batch": "2025-01", "status": "success",
- "duration_ms": 130.39, "rows_in": 2000, "rows_out": 2000, "run_id": "20261105T232817-366de0b8"}
+ "duration_ms": 148.29, "cpu_ms": 125.0, "rows_in": 2000, "rows_out": 2000,
+ "run_id": "20261106T011028-c9ccd676"}
 ```
 
-Os logs registram contagens, nomes de colunas e de regras — **nunca valores de linhas**. A pasta `logs/` não é versionada; os eventos e alertas consolidados ficam em `reports/observability/`.
+Os logs registram contagens, nomes de colunas e de regras — **nunca valores de linhas**.
 
 ## 3. Eventos de estágio (saúde operacional)
 
-Cada estágio roda dentro de `tracker.stage(...)`, que mede a duração e classifica o resultado:
+Cada estágio roda dentro de `tracker.stage(...)`, que mede a duração e o tempo de CPU e classifica o resultado:
 
 | Status | Significado |
 |---|---|
 | `success` | O estágio terminou normalmente |
-| `blocked` | O estágio barrou a remessa de propósito (contrato reprovado); o pipeline segue para a próxima |
+| `blocked` | O estágio barrou a entrada de propósito (contrato reprovado, arquivo de rótulos rejeitado); o pipeline segue para a próxima remessa |
 | `failed` | Erro inesperado; a exceção é propagada e a execução para |
 
 Distinguir `blocked` de `failed` importa para o plantão: um bloqueio é o sistema funcionando; uma falha é um defeito do pipeline.
 
-Última execução ([`pipeline_events.jsonl`](../reports/observability/pipeline_events.jsonl)), pipeline `monitor`:
+Execução de referência ([`pipeline_events.jsonl`](../reports/observability/pipeline_events.jsonl)), pipeline `monitor`:
 
-| Estágio | Execuções | Sucesso | Bloqueio | Falha | Mediana | Máximo |
-|---|---|---|---|---|---|---|
-| `read_batch` | 13 | 13 | 0 | 0 | 12 ms | 15 ms |
-| `contract` | 13 | 12 | 1 | 0 | 66 ms | 126 ms |
-| `score` | 12 | 12 | 0 | 0 | 27 ms | 30 ms |
-| `drift` | 12 | 12 | 0 | 0 | 133 ms | 153 ms |
-| `performance` | 12 | 12 | 0 | 0 | 31 ms | 37 ms |
-| `evidently` | 3 | 3 | 0 | 0 | 3,2 s | 6,7 s |
+| Estágio | Execuções | Sucesso | Bloqueio | Falha | Duração mediana | Duração máxima | CPU total |
+|---|---|---|---|---|---|---|---|
+| `load_baselines` | 1 | 1 | 0 | 0 | 0,1 s | 0,1 s | 0,2 s |
+| `read_batch` | 13 | 13 | 0 | 0 | 14 ms | 20 ms | 0,1 s |
+| `contract` | 13 | 12 | 1 | 0 | 115 ms | 323 ms | 1,5 s |
+| `score` | 12 | 12 | 0 | 0 | 37 ms | 147 ms | 0,4 s |
+| `drift` | 12 | 12 | 0 | 0 | 142 ms | 282 ms | 1,6 s |
+| `performance` | 12 | 12 | 0 | 0 | 42 ms | 96 ms | 0,4 s |
+| `evidently` | 3 | 3 | 0 | 0 | 3,6 s | 8,1 s | 12,6 s |
 
-Treze remessas recebidas, doze escoradas (24.000 propostas) e uma bloqueada (2.040 linhas em quarentena). A escoragem leva cerca de 10 ms por mil propostas; os tempos variam com a máquina e com a carga do momento, e servem como ordem de grandeza.
+São 66 execuções de estágio: 65 com sucesso, 1 bloqueio e nenhuma falha. Treze remessas recebidas, doze escoradas (24.000 propostas) e uma bloqueada (2.040 linhas em quarentena). A escoragem leva entre 12 e 73 ms por mil propostas. Os tempos variam com a máquina e com a carga do momento e servem como ordem de grandeza.
 
 ## 4. Catálogo de métricas
 
-### 4.1 Saúde do pipeline
+### 4.1 Saúde do pipeline e da infraestrutura
 
-| Métrica | Série Prometheus | O que responde | Atenção quando |
-|---|---|---|---|
-| Execuções de estágio por resultado | `creditwatch_stage_runs_total{stage,status}` | O pipeline está rodando? Algum estágio falha? | qualquer `status="failed"` |
-| Duração dos estágios | `creditwatch_stage_duration_seconds{stage}` (histograma) | Algum estágio ficou lento? | p95 acima de 3× a mediana histórica |
-| Remessas por resultado | `creditwatch_batches_total{status}` | Quantas remessas foram escoradas e quantas bloqueadas? | `blocked` > 0 |
-| Volume processado | `creditwatch_rows_total{outcome}` (`scored`, `quarantined`) | O volume está dentro do esperado? | queda > 30% contra a média |
-| Violações do contrato | `creditwatch_contract_violations_total{rule}` | Qual regra a origem está quebrando? | qualquer incremento |
-| Última execução | `creditwatch_last_run_timestamp_seconds` | O job mensal rodou? | sem atualização há mais de 35 dias |
-| Último lote | `creditwatch_last_batch_info{batch,model_version}` | Qual lote e qual modelo estão em produção? | — |
+O pipeline é um job em lote, sem serviço no ar. A infraestrutura é observada pelo que faz sentido para um job: duração e tempo de CPU por estágio, falhas, volume e a data da última execução. Métricas de máquina (memória, disco, rede) ficam com o orquestrador ou com o node_exporter do ambiente onde o job for agendado.
+
+| Métrica | Série Prometheus | O que responde |
+|---|---|---|
+| Execuções de estágio por resultado | `creditwatch_stage_runs_total{stage,status}` | O pipeline está rodando? Algum estágio falha? |
+| Duração dos estágios | `creditwatch_stage_duration_seconds{stage}` (histograma) | Algum estágio ficou lento? |
+| Tempo de CPU por estágio | `creditwatch_stage_cpu_seconds_total{stage}` | Qual estágio consome recurso? |
+| Remessas por resultado | `creditwatch_batches_total{status}` | Quantas remessas foram escoradas e quantas bloqueadas? |
+| Volume processado | `creditwatch_rows_total{outcome}` (`scored`, `quarantined`) | O volume está dentro do esperado? |
+| Violações do contrato | `creditwatch_contract_violations_total{rule}` | Qual regra a origem está quebrando? |
+| Última execução | `creditwatch_last_run_timestamp_seconds` | O job mensal rodou? |
+| Último lote | `creditwatch_last_batch_info{batch,model_version}` | Qual lote e qual modelo estão em produção? |
+
+Para estas séries o projeto **não emite alertas**; os alertas implementados são os da seção 4.4. Limiares recomendados para quem ligar as séries a um Alertmanager: qualquer estágio `failed`; qualquer remessa `blocked`; duração acima de três vezes a mediana histórica; volume 30% abaixo da média; nenhuma execução em 35 dias.
 
 ### 4.2 Drift (disponível no dia da escoragem)
 
@@ -79,17 +88,19 @@ Treze remessas recebidas, doze escoradas (24.000 propostas) e uma bloqueada (2.0
 | Features com drift | `creditwatch_drifted_features` | Número de features em atenção ou crítico | — |
 | Fração com drift | `creditwatch_drift_share` | Features com drift ÷ features monitoradas | drift do dataset ≥ 0,30 |
 | PSI do score | `creditwatch_score_psi` | PSI do score contra o score da referência fora do treino | atenção ≥ 0,10 · crítico ≥ 0,25 |
-| Taxa de aprovação | `creditwatch_approval_rate` | Fração de propostas com PD abaixo do ponto de corte | sem limiar fixo; métrica de negócio |
+| Taxa de aprovação | `creditwatch_approval_rate` | Fração de propostas com PD abaixo do ponto de corte | sem limiar; métrica de negócio |
 
-### 4.3 Saúde do modelo (disponível após a maturação do rótulo)
+### 4.3 Saúde do modelo (só após a maturação do rótulo)
 
 | Métrica | Série Prometheus | Definição | Limiar |
 |---|---|---|---|
 | ROC AUC | `creditwatch_model_roc_auc` | Poder de ordenação entre bons e maus pagadores | queda ≥ 0,03 atenção · ≥ 0,05 crítico |
 | KS | `creditwatch_model_ks` | Maior separação entre as distribuições de score | acompanha o AUC |
-| Taxa de inadimplência | `creditwatch_default_rate` | Fração de inadimplentes no lote | mudança ≥ 5 p.p. com p < 0,05 |
-| Calibração | — (`calibration_gap` no resumo do lote) | Inadimplência observada − PD média prevista | \|diferença\| ≥ 5 p.p. |
-| Inadimplência entre aprovados | `creditwatch_bad_rate_approved` | Inadimplentes ÷ aprovados: a perda que chega à carteira | métrica de negócio; referência 12,3% |
+| Taxa de inadimplência | `creditwatch_default_rate` | Fração de inadimplentes no lote | mudança ≥ 5 p.p. com p < 0,05 atenção · ≥ 10 p.p. crítico |
+| Calibração | — (`calibration_gap` no resumo do lote) | Inadimplência observada − PD média prevista | \|diferença\| ≥ 5 p.p. atenção · ≥ 10 p.p. crítico |
+| Inadimplência entre aprovados | `creditwatch_bad_rate_approved` | Inadimplentes ÷ aprovados: a perda que chega à carteira | sem limiar; referência 12,0% |
+
+A base de comparação é a partição de teste da referência (ROC AUC 0,780). As séries de performance refletem o último lote escorado, cujo rótulo, em produção, só existiria dois meses depois; o campo `detectable_at` de cada alerta registra essa data.
 
 Todos os limiares são configuráveis por variável de ambiente (`.env.example`).
 
@@ -97,16 +108,16 @@ Todos os limiares são configuráveis por variável de ambiente (`.env.example`)
 
 | Família (`kind`) | Dispara quando | Depende de rótulo |
 |---|---|---|
-| `data_quality` | Remessa bloqueada pelo contrato | não |
+| `data_quality` | Remessa bloqueada pelo contrato (crítico) ou arquivo de rótulos rejeitado (atenção) | não |
 | `data_drift` | Feature em atenção ou crítico, ou drift do dataset — **no máximo um alerta por remessa**, listando as features mais afetadas | não |
 | `prediction_drift` | PSI do score ≥ 0,10 | não |
 | `performance` | Queda de ROC AUC ≥ 0,03 | sim |
 | `calibration` | Inadimplência observada distante da PD prevista | sim |
 | `target_drift` | Taxa de inadimplência mudou de forma significativa e relevante | sim |
 
-Cada alerta de [`alerts.jsonl`](../reports/observability/alerts.jsonl) traz severidade, métrica, valor, limiar e `detectable_at`: o mês em que poderia disparar em produção. Para as famílias que dependem de rótulo, é o mês da remessa mais o atraso de maturação — a queda de performance de setembro só é detectável em novembro.
+Cada alerta de [`alerts.jsonl`](../reports/observability/alerts.jsonl) traz severidade, métrica, valor, limiar e `detectable_at`: o mês em que poderia disparar em produção. Para as famílias que dependem de rótulo, é o mês da remessa mais o atraso de maturação — a queda de performance de outubro só é detectável em dezembro.
 
-Na execução de referência foram **29 alertas (18 críticos e 11 de atenção)**: 9 de drift de dados, 7 de drift do alvo, 6 de drift de predição, 4 de performance, 2 de calibração e 1 de qualidade de dados. A série `creditwatch_alerts_total{kind,severity}` traz a contagem.
+Na execução de referência foram **28 alertas (20 críticos e 8 de atenção)**: 9 de drift de dados, 7 de drift do alvo, 6 de drift de predição, 3 de performance, 2 de calibração e 1 de qualidade de dados. Seis deles só seriam detectáveis em janeiro e fevereiro de 2026. A série `creditwatch_alerts_total{kind,severity}` traz a contagem.
 
 ## 5. MLflow
 
@@ -117,8 +128,10 @@ make mlflow-ui     # http://127.0.0.1:5000
 
 | Experimento | Runs | Conteúdo |
 |---|---|---|
-| `creditwatch-treino` | 1 run pai + 1 filho por candidato | Hiperparâmetros, métricas de validação de cada candidato, métricas de teste do escolhido, `metadata.json` e o modelo com assinatura, registrado como `credit-scoring-baseline` no Model Registry |
-| `creditwatch-monitoramento` | 1 run pai por execução + 1 filho por remessa | No run pai, as métricas de cada remessa são logadas com `step`, e a aba de métricas mostra a série temporal de `performance/roc_auc`, `drift/n_drifted`, `psi/<feature>`, `prediction/score_psi` e `alerts/critical`. Cada run filho guarda o plano do mês como parâmetros, o resumo JSON e o relatório do Evidently como artefatos |
+| `creditwatch-treino` | 1 run pai + 1 filho por candidato (3 no total) | Hiperparâmetros, métricas de validação de cada candidato, métricas de teste do escolhido, `metadata.json` e o modelo com assinatura, registrado como `credit-scoring-baseline` (versão 1) no Model Registry |
+| `creditwatch-monitoramento` | 1 run pai por execução + 1 filho por remessa (14 no total) | No run pai, as métricas de cada remessa são logadas com `step`, e a aba de métricas mostra a série temporal de `performance/roc_auc`, `drift/n_drifted`, `psi/<feature>`, `prediction/score_psi` e `alerts/critical` (71 métricas). Cada run filho guarda o plano do mês como parâmetros, o resumo JSON e o relatório do Evidently como artefatos |
+
+O banco do MLflow não é versionado. [`mlflow_summary.json`](../reports/observability/mlflow_summary.json) é gerado ao fim da execução e lista os experimentos, os runs, a contagem de métricas e parâmetros de cada um e os modelos registrados.
 
 O modelo é registrado no formato nativo de cada biblioteca, sem pickle: XGBoost em UBJ (`mlflow.xgboost`) e pipelines scikit-learn em skops (`mlflow.sklearn`).
 
@@ -132,8 +145,8 @@ O monitoramento grava [`metrics.prom`](../reports/observability/metrics.prom) no
 creditwatch_batches_total{status="scored"} 12.0
 creditwatch_batches_total{status="blocked"} 1.0
 creditwatch_contract_violations_total{rule="DQ-09"} 1.0
-creditwatch_feature_psi{feature="utilization_1"} 0.90483
-creditwatch_model_roc_auc 0.6129206151967529
+creditwatch_feature_psi{feature="utilization_1"} 0.81276
+creditwatch_model_roc_auc 0.5948274646780003
 creditwatch_alerts_total{kind="data_drift",severity="critical"} 8.0
 ```
 
@@ -155,7 +168,7 @@ groups:
         expr: creditwatch_drift_share >= 0.30
         labels: { severity: critical }
       - alert: ModeloDegradado
-        expr: creditwatch_model_roc_auc < 0.727   # referência 0,777 menos 0,05
+        expr: creditwatch_model_roc_auc < 0.730   # referência 0,780 menos 0,05
         labels: { severity: critical }
       - alert: MonitoramentoParado
         expr: time() - creditwatch_last_run_timestamp_seconds > 35 * 86400
@@ -170,12 +183,12 @@ Essas regras são um exemplo de integração e não fazem parte do que o reposit
 
 | Seção | O que mostra |
 |---|---|
-| Indicadores | ROC AUC e inadimplência entre aprovados no último mês contra a referência, features com drift, alertas, remessas e volume |
+| Indicadores | ROC AUC e inadimplência entre aprovados no último mês com rótulo, contra a referência; features com drift, alertas, remessas e volume |
 | Saúde do modelo | ROC AUC por mês com o limite de alerta; inadimplência observada × PD prevista × inadimplência entre aprovados |
 | Drift dos dados de entrada | Features com drift por mês (atenção e crítico), PSI das três features mais afetadas, mapa de PSI por feature e mês |
-| Detalhe do mês | Seletor de mês: PSI, teste, estatística, p-valor e médias de cada feature; alertas do mês; link para o relatório do Evidently |
+| Detalhe do mês | Seletor de mês: PSI, teste, tamanho do efeito, p-valor e médias de cada feature; alertas do mês; link para o relatório do Evidently |
 | Saúde do pipeline | Situação de cada remessa, execuções e duração por estágio, regras violadas na remessa bloqueada |
-| Causa da degradação | Atribuição da queda de AUC por mecanismo, inadimplência observada × prevista por segmento, remediação, auditoria de viés |
+| Causa da degradação | Atribuição da queda de AUC por mecanismo, varredura de calibração, inadimplência observada × prevista por segmento, backtest de remediação, auditoria de viés com intervalo de confiança |
 | Todos os alertas | Lista completa com severidade, tipo e mês em que cada alerta é detectável |
 
-Todo gráfico tem uma tabela equivalente ("Ver tabela") e responde ao teclado (setas esquerda e direita). Para abrir localmente: `make serve-reports` e acessar <http://127.0.0.1:8000/dashboard/>, ou abrir o arquivo direto no navegador.
+Todo gráfico tem uma tabela equivalente ("Ver tabela") e responde ao teclado (setas esquerda e direita). Se nenhuma remessa tiver rótulo maduro, os indicadores de performance aparecem vazios e o painel não acusa degradação. Para abrir localmente: `make serve-reports` e acessar <http://127.0.0.1:8000/dashboard/>, ou abrir o arquivo direto no navegador.

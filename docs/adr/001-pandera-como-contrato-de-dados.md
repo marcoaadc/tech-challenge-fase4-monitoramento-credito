@@ -12,7 +12,7 @@ Usar **Pandera** (`pandera.pandas`) com um `DataFrameSchema` construído em cód
 
 1. valida em modo *lazy*, coletando todas as falhas de uma vez;
 2. agrupa as falhas por regra de um catálogo com identificador estável (`DQ-01` … `DQ-13`, `DQ-W01`);
-3. se houver violação, move o lote para a quarentena, grava o relatório e levanta `DataContractError` — nada é escorado;
+3. se houver violação, copia o lote para a quarentena (sem as colunas fora do contrato), grava o relatório e levanta `DataContractError` — nada é escorado;
 4. devolve código de saída 1 na CLI (`creditwatch.pipelines.validate`), para servir de portão em orquestrador ou CI.
 
 O esquema é `strict=True`: colunas fora do contrato reprovam o lote.

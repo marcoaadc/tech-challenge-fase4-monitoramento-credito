@@ -17,7 +17,7 @@ Guia de resposta para quem opera o modelo de crédito. Cada alerta de [`alerts.j
 
 1. Abrir `reports/data_quality/blocked_<remessa>.json`: quais regras, quantas linhas, quais colunas.
 2. Classificar a causa pela regra:
-   - `DQ-09` (coluna extra ou ausente) → mudança de layout na origem. Se a coluna extra for um dado pessoal (ex.: `cpf`), tratar como **incidente de privacidade**: avisar o encarregado e apagar a cópia em quarentena assim que a origem confirmar a correção.
+   - `DQ-09` (coluna extra ou ausente) → mudança de layout na origem. Se a coluna extra for um dado pessoal (ex.: `cpf`), tratar como **incidente de privacidade**: avisar o encarregado e pedir à origem que corrija o envio. A cópia em quarentena não contém a coluna (colunas fora do contrato nunca são gravadas); o arquivo original recebido deve ser eliminado de imediato.
    - `DQ-01`, `DQ-10`, `DQ-11` → falha de extração ou de transferência; pedir o reenvio.
    - `DQ-02`, `DQ-03`, `DQ-05` a `DQ-08` → erro de cadastro ou de unidade; a origem corrige.
    - `DQ-04` → reenvio parcial; deduplicar na origem.
@@ -39,7 +39,7 @@ Guia de resposta para quem opera o modelo de crédito. Cada alerta de [`alerts.j
 4. Priorizar pelas features que pesam no modelo: a tabela "PSI × importância" de [`analysis_report.md`](../reports/analysis/analysis_report.md) separa o drift que afeta o score do drift que só faz barulho.
 5. Marcar a revisão de performance para quando o rótulo dessas safras amadurecer (2 meses).
 
-**Não retreinar por reflexo.** No cenário deste projeto, 23 features entram em drift entre abril e agosto e o ROC AUC não cai; retreinar ali gastaria esforço e trocaria um modelo validado por outro sem ganho.
+**Não retreinar por reflexo.** No cenário deste projeto, 22 features entram em drift entre abril e agosto e o ROC AUC não cai; retreinar ali gastaria esforço e trocaria um modelo validado por outro sem ganho. O que o drift de dados muda nesse período é o negócio: a aprovação cai de 76% para 55% e a inadimplência entre aprovados sobe 3 pontos.
 
 ## 3. Drift de predição (`prediction_drift`)
 
@@ -59,7 +59,7 @@ Guia de resposta para quem opera o modelo de crédito. Cada alerta de [`alerts.j
 2. **Diagnosticar.** Rodar `make analyze` e ler `reports/analysis/`:
    - *Inadimplência observada × prevista por segmento*: um segmento em que a observada descola da prevista, sem drift nas suas features, é drift de conceito localizado.
    - Se o drift de dados é forte e a calibração por segmento está preservada, o problema é de população, e recalibrar pode bastar.
-3. **Corrigir.** Avaliar um desafiante treinado com as safras recentes já maduras. O experimento de remediação compara as estratégias em meses posteriores ao treino; nos dados deste projeto, retreinar com a janela recente leva o ROC AUC de 0,632 para 0,699 e a inadimplência entre aprovados de 29,7% para 26,1% — recupera parte, não tudo, porque a mudança continua se intensificando.
+3. **Corrigir, sabendo o limite.** Avaliar um desafiante e uma recalibração por segmento, sempre com três cuidados: usar só rótulos já maduros na data da decisão, testar em meses posteriores e não ter o mesmo cliente no ajuste e no teste. No backtest deste projeto, nenhuma estratégia de modelo recupera a queda: a melhor leva o ROC AUC de 0,610 para 0,631, e mesmo um retreino com rótulos imediatos chegaria a 0,646, contra 0,780 da referência. Quando o backtest mostra isso, a correção é de política de crédito (passo 1), e o retreino entra como complemento.
 4. **Promover com governança.** O desafiante só substitui o campeão depois de: passar pelos mesmos testes do contrato e de drift, repetir a auditoria de viés, ter o model card atualizado e a aprovação do comitê registrada. A versão anterior fica disponível para reversão.
 5. **Reduzir a janela cega.** A queda de setembro só é detectável em novembro. Se o atraso for inaceitável, monitorar indicadores antecipados (atraso de 30 dias em vez de inadimplência plena) como rótulo provisório.
 
@@ -80,9 +80,9 @@ Guia de resposta para quem opera o modelo de crédito. Cada alerta de [`alerts.j
 3. Registrar a análise e a decisão (manter, ajustar corte, rever features, revisão humana das negativas do grupo) e levar ao encarregado e ao comitê de modelos.
 4. Garantir o canal de revisão da decisão automatizada para os titulares afetados (LGPD, art. 20).
 
-No cenário deste projeto nenhum grupo cruza o limite, mas a distância diminui com o drift: a razão do grupo de escolaridade "ensino médio" vai de 0,87 na referência para 0,83 durante o drift de dados, quando a parcela desse grupo com atraso recente sobe de 27% (meses estáveis) para 42% e o modelo, que reage a atrasos, passa a negá-lo mais.
+No cenário deste projeto nenhum grupo cruza o limite na estimativa pontual, mas para escolaridade o resultado é inconclusivo: a razão do grupo "ensino médio" vai de 0,87 (intervalo de 0,83 a 0,92) na referência para 0,83 (0,80 a 0,87) no drift de dados e 0,82 (0,77 a 0,87) no drift de conceito, e a diferença de oportunidade chega a 13,2 p.p. Um intervalo que cruza 0,80 pede investigação, não arquivamento.
 
-Antes de concluir que há impacto adverso, conferir o tamanho dos grupos: a auditoria só compara grupos com pelo menos 100 clientes e 2% da amostra. Sem esse piso, um grupo de 122 clientes com 82% de aprovação virava a referência e fazia "ensino médio" aparecer com 0,72.
+Antes de concluir que há impacto adverso, conferir o tamanho dos grupos: a auditoria só compara grupos com pelo menos 100 clientes e 2% da amostra. Sem esse piso, no drift de dados, o grupo "outros" de escolaridade (123 clientes, 81% de aprovação) viraria a referência e faria "ensino médio" aparecer com 0,73. Os grupos pequenos continuam no relatório, marcados como fora da comparação.
 
 ## 7. Falha de estágio (`status = failed` nos eventos)
 

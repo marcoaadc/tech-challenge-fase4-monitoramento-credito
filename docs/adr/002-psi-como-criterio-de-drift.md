@@ -4,13 +4,13 @@
 
 ## Contexto
 
-Cada remessa de produção tem 2.000 propostas e é comparada com uma referência de cerca de 15.000. Com amostras desse tamanho, testes de hipótese (Kolmogorov-Smirnov, qui-quadrado) rejeitam a igualdade para diferenças sem nenhuma relevância prática: no último mês do cenário, **29 das 30 features têm p < 0,001**, inclusive as que mal se moveram. Um alerta baseado só em p-valor dispararia sempre e deixaria de informar.
+Cada remessa de produção tem 2.000 propostas e é comparada com uma referência de cerca de 15.000. Com amostras desse tamanho, testes de hipótese (Kolmogorov-Smirnov, qui-quadrado) rejeitam a igualdade para diferenças sem nenhuma relevância prática: no último mês do cenário, **28 das 30 features têm p < 0,001**, inclusive as que mal se moveram. Um alerta baseado só em p-valor dispararia sempre e deixaria de informar.
 
 ## Decisão
 
 1. A severidade de cada feature é decidida por **tamanho de efeito**:
    - PSI ≥ 0,25 → crítico; PSI ≥ 0,10 → atenção (faixas clássicas da indústria de crédito);
-   - o teste de hipótese só eleva uma feature de estável para atenção quando o efeito também é relevante (D do KS ou V de Cramér ≥ 0,10 **e** p < 0,05).
+   - o teste de hipótese só eleva uma feature de estável para atenção quando o efeito também é relevante (D do KS nas numéricas ou distância de variação total nas categóricas ≥ 0,10 **e** p < 0,05).
 2. Há *drift do dataset* quando 30% ou mais das features monitoradas estão em atenção ou crítico.
 3. O detector é implementado no próprio projeto (`drift/statistics.py`, `drift/detector.py`) e o **Evidently** roda em paralelo com o mesmo método (PSI) e os mesmos limiares, gerando o relatório HTML e servindo de contraprova (`tests/test_integrations.py`).
 

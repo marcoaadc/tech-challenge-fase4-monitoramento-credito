@@ -15,7 +15,7 @@ make test-fast       # testes de unidade, em segundos
 1. Crie uma branch a partir de `main` (`feat/...`, `fix/...`, `docs/...`).
 2. Rode `make lint test` antes de abrir o PR. O CI executa lint, testes em Python 3.10 a 3.12 e o pipeline completo em ambiente limpo.
 3. Mensagens de commit seguem [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `test:`, `ci:`, `build:`, `chore:`, com escopo quando ajuda (`feat(contracts): ...`).
-4. Registre mudanças relevantes em `CHANGELOG.md` (seção *Não lançado*).
+4. Registre mudanças relevantes em `CHANGELOG.md`, em uma seção *Não lançado* no topo (crie-a se não existir).
 
 ## Quando regenerar os artefatos
 
@@ -35,6 +35,7 @@ Se os números mudarem, atualize as tabelas do `README.md` e de `docs/`, e o Mod
 - Estágios do pipeline são funções `run_*` em `src/creditwatch/pipelines/`; a CLI apenas as chama.
 - Toda regra nova do contrato entra no catálogo (`contracts/rules.py`) com identificador `DQ-xx` e ganha um injetor de defeito em `simulation/corruption.py`, que o teste parametrizado usa para provar que ela dispara sozinha.
 - Toda função estatística nova tem teste com um caso de resposta conhecida.
+- Experimento que treina em uns meses e testa em outros precisa respeitar a maturação do rótulo e separar clientes entre treino e teste (`remediation_experiment` valida os dois).
 - Textos exibidos ao usuário (alertas, títulos de regra, relatórios) são acentuados; comentários e docstrings ficam em ASCII.
 
 ## Privacidade

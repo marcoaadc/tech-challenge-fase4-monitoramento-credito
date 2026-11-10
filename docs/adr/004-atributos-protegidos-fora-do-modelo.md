@@ -6,7 +6,7 @@
 
 O dataset traz sexo, idade, estado civil e escolaridade de cada cliente. Usá-los como preditores de inadimplência faria a decisão de crédito depender diretamente de características pessoais que o titular não controla, em tensão com o princípio da não discriminação (LGPD, art. 6º, IX) e com a vedação de informações sensíveis e excessivas na análise de crédito (Lei 12.414/2011, art. 3º, § 3º).
 
-O ganho de desempenho foi medido (`protected_attribute_ablation`, em `reports/analysis/fairness_audit.json`): treinando o mesmo XGBoost com e sem os quatro atributos, em três seeds, o ROC AUC de teste é **0,781 nos dois casos** (0,7806 com, 0,7809 sem) e a diferença na validação é de +0,003. O histórico de pagamento já carrega a informação preditiva; os atributos pessoais só acrescentariam risco.
+O ganho de desempenho foi medido (`protected_attribute_ablation`, em `reports/analysis/fairness_audit.json`): treinando o mesmo XGBoost com e sem os quatro atributos, em três seeds, o ROC AUC de teste é **0,781 nos dois casos** (0,7806 com, 0,7809 sem); na validação, 0,7782 contra 0,7754. O histórico de pagamento já carrega a informação preditiva; os atributos pessoais só acrescentariam risco.
 
 Por outro lado, apagar essas colunas impediria medir se o modelo trata os grupos de forma desigual: retirar um atributo das entradas não retira o seu efeito, porque as variáveis financeiras podem funcionar como *proxies*.
 
@@ -28,5 +28,5 @@ Por outro lado, apagar essas colunas impediria medir se o modelo trata os grupos
 ## Consequências
 
 - **Positivas:** a decisão é explicável só com variáveis financeiras (direito à revisão, LGPD art. 20); o metadado do modelo registra os atributos excluídos (`excluded_protected_attributes`).
-- **Negativas:** a auditoria mostra que a exclusão **não elimina** a disparidade. O grupo de escolaridade "ensino médio" é aprovado a 0,87 da taxa do grupo mais aprovado na referência e a 0,83 durante o drift de dados — acima do limite de quatro quintos, mas se aproximando dele. O resultado está no README (mitigação de vieses) e o que fazer se o limite for cruzado, em [docs/runbook.md](../runbook.md).
+- **Negativas:** a auditoria mostra que a exclusão **não elimina** a disparidade. O grupo de escolaridade "ensino médio" é aprovado a 0,87 da taxa do grupo mais aprovado na referência e a 0,83 durante o drift de dados, com intervalo de 95% que encosta em 0,80; entre bons pagadores, a diferença de aprovação chega a 13,2 p.p. O resultado está no README (mitigação de vieses) e o que fazer se o limite for cruzado, em [docs/runbook.md](../runbook.md).
 - **Custo de privacidade:** manter os atributos significa tratá-los; por isso têm finalidade declarada (auditoria e validação), não entram em logs nem em relatórios de falha com identificação, e seguem o plano de retenção.

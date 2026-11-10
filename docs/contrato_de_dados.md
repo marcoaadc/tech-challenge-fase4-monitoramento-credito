@@ -32,7 +32,7 @@ Cada regra tem um identificador estável, usado no relatório de validação, no
 | `DQ-07` | Pagamentos não negativos | `pay_amt_1..6` ≥ 0 | bloqueante |
 | `DQ-08` | Faturas plausíveis | `bill_amt_1..6` entre −1.000.000 e 10.000.000 (erro de unidade ou escala) | bloqueante |
 | `DQ-09` | Esquema estrito | Todas as colunas do contrato presentes e **nenhuma coluna extra** (ex.: PII) | bloqueante |
-| `DQ-10` | Tipos | Colunas numéricas inteiras, sem texto ou fração | bloqueante |
+| `DQ-10` | Tipos | Colunas numéricas inteiras: texto e valores com fração reprovam | bloqueante |
 | `DQ-11` | Volume mínimo | Pelo menos 500 linhas no lote (arquivo truncado) | bloqueante |
 | `DQ-12` | Rótulo binário | Quando presente, `default` só admite 0 ou 1 | bloqueante |
 | `DQ-13` | Mês de referência | `reference_month` no formato `AAAA-MM` e único no lote | bloqueante |
@@ -46,13 +46,17 @@ O enunciado pede ao menos três regras rígidas (sem nulos, faixa de idade, limi
 
 `enforce_contract` ([`gate.py`](../src/creditwatch/contracts/gate.py)) valida em modo *lazy* — coleta todas as falhas, não só a primeira — e, havendo violação:
 
-1. copia o lote para `data/quarantine/<remessa>/batch.csv`, com o `validation_report.json` ao lado;
+1. copia o lote para `data/quarantine/<remessa>/batch.csv`, **sem as colunas que não estão no contrato**, com o `validation_report.json` ao lado;
 2. grava o relatório em `reports/data_quality/blocked_<remessa>.json`;
 3. levanta `DataContractError`; no pipeline de monitoramento o estágio `contract` é marcado como `blocked`, um alerta crítico `data_quality` é emitido e os estágios seguintes **não rodam** para aquela remessa.
 
 O lote inteiro é bloqueado, e não só as linhas inválidas: 3% de limites nulos indicam falha na origem, e escorar os 97% restantes produziria uma amostra enviesada sem que ninguém notasse ([ADR 001](adr/001-pandera-como-contrato-de-dados.md)).
 
-**Privacidade do relatório de falha.** Exemplos de valores inválidos só são registrados para colunas previstas no contrato (ex.: idades `13`, `176`). De colunas inesperadas fica apenas o nome, e do identificador do cliente nunca se registra valor. Um teste garante que nenhum CPF do lote de demonstração aparece no relatório serializado.
+**Privacidade do relatório e da quarentena.** Exemplos de valores inválidos só são registrados para colunas previstas no contrato (ex.: idades `13`, `176`). De colunas inesperadas fica apenas o nome, e do identificador do cliente nunca se registra valor. A cópia em quarentena também descarta as colunas inesperadas: se a origem mandou um `cpf` por engano, a quarentena não vira uma segunda cópia dele. Testes garantem que nenhum CPF do lote de demonstração aparece no relatório nem no arquivo em quarentena.
+
+**Fração em coluna inteira.** O contrato converte os tipos, porque um CSV lê inteiros como decimais quando há nulos. Sem cuidado, a conversão truncaria `17.9` para `17` e o lote passaria. Uma checagem anterior à conversão reporta qualquer valor com fração como violação de `DQ-10`.
+
+**Limite conhecido.** Quando uma coluna numérica traz texto, as outras regras daquela coluna (faixa, domínio) não podem ser avaliadas: só a violação de tipo é reportada, e as demais aparecem depois que a origem corrigir o tipo.
 
 ## 4. Demonstração: o lote com erros
 
@@ -84,12 +88,12 @@ make demo-bad-batch
 ```
 Contrato: credit_batch | Lote: batch_2025-07_remessa1_corrompida | 2040 linhas x 26 colunas
 Resultado: BLOQUEADO
-Linhas com pelo menos uma falha: 246
+Linhas com pelo menos uma falha: 247
 
 Regra    Falhas  Titulo                     Colunas
 DQ-01        60  Completude                 limit_bal
 DQ-02        40  Idade válida               age
-DQ-03        20  Limite de crédito          limit_bal
+DQ-03        21  Limite de crédito          limit_bal
 DQ-04        80  Unicidade                  customer_id
 DQ-05        40  Domínio dos categóricos    education, sex
 DQ-07        20  Pagamentos não negativos   pay_amt_1
@@ -113,4 +117,4 @@ Os CPFs da demonstração são fictícios e **inválidos por construção** (o d
 
 ## 5. Como o contrato é testado
 
-[`tests/test_contract.py`](../tests/test_contract.py) tem um teste parametrizado por defeito: cada um dos doze injetores precisa violar **exatamente** a sua regra e nenhuma outra. Há ainda testes para o dado bruto (399 falhas em `DQ-05`), para o rótulo proibido em produção, para a coerção de tipos, para a quarentena e para a não exposição de PII no relatório.
+[`tests/test_contract.py`](../tests/test_contract.py) tem um teste parametrizado por defeito: cada um dos doze injetores precisa violar **exatamente** a sua regra e nenhuma outra. Há ainda testes para o dado bruto (399 falhas em `DQ-05`), para o rótulo proibido em produção, para a coerção de tipos, para a fração em coluna inteira, para a quarentena sem colunas fora do contrato e para a não exposição de PII no relatório.
