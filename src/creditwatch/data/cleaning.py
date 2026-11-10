@@ -1,8 +1,9 @@
 """Regras de limpeza que transformam o dataset bruto no Dataset de Referencia.
 
 Cada regra e explicita e auditavel: o relatorio devolvido registra quantas linhas cada uma afetou.
-O dataset bruto *nao* passa no contrato de dados (codigos fora do dicionario e duplicatas); so o
-resultado desta limpeza pode ser usado para treino.
+O dataset bruto *nao* passa no contrato de dados (codigos fora do dicionario, regra DQ-05); so o
+resultado desta limpeza pode ser usado para treino. As duplicatas removidas aqui tem IDs
+diferentes, entao o contrato nao as acusa: tira-las e uma decisao de modelagem, nao de validacao.
 """
 
 from __future__ import annotations

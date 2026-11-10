@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import zipfile
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -55,6 +56,23 @@ def test_load_raw_dataset_rejects_truncated_file(tmp_path, raw_frame):
     raw_frame.head(10).rename(columns=inverse).to_csv(path, index=False)
     with pytest.raises(source.DatasetIntegrityError, match="esperadas 30000 linhas"):
         source.load_raw_dataset(path)
+
+
+def test_load_raw_dataset_rejects_an_edited_snapshot(tmp_path, raw_frame):
+    """Mesmo layout e mesmas 30.000 linhas, mas um valor alterado: o hash acusa."""
+    inverse = {new: old for old, new in RAW_RENAME.items()}
+    edited = raw_frame.rename(columns=inverse)
+    edited.loc[0, "LIMIT_BAL"] += 1
+    path = tmp_path / "edited.csv"
+    edited.to_csv(path, index=False, lineterminator="\n")
+    with pytest.raises(source.DatasetIntegrityError, match="sha256 do CSV bruto"):
+        source.load_raw_dataset(path)
+    assert len(source.load_raw_dataset(path, expected_sha256=None)) == source.EXPECTED_ROWS
+
+
+def test_versioned_snapshot_matches_the_pinned_hash():
+    snapshot = Path(__file__).resolve().parents[1] / "data" / "raw" / "default_of_credit_card_clients.csv"
+    assert source.sha256_of(snapshot) == source.RAW_CSV_SHA256
 
 
 def _fake_zip(frame: pd.DataFrame, monkeypatch) -> bytes:
