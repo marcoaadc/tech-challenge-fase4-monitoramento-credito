@@ -9,49 +9,207 @@
     "2025-06",
     "2025-07",
     "2025-08",
-    "2025-09",
-    "2025-10"
+    "2025-09"
   ],
   "recent_months": [
+    "2025-07",
     "2025-08",
-    "2025-09",
-    "2025-10"
+    "2025-09"
   ],
   "test_months": [
     "2025-11",
     "2025-12"
   ],
+  "label_lag_months": 2,
+  "disjoint_customers": true,
+  "folds": 2,
   "test_rows": 4000,
+  "champion_approval_rate": 0.5595,
+  "segment_calibration_factors": {
+    "em atraso": 1.11,
+    "em dia, utilização alta": 1.085,
+    "em dia, utilização baixa": 0.876
+  },
   "strategies": {
     "campeao": {
       "train_rows": 8989,
       "threshold": 0.2894,
-      "roc_auc": 0.6319,
-      "ks": 0.1864,
-      "brier": 0.2392,
-      "calibration_gap": 0.056,
-      "approval_rate": 0.5535,
-      "bad_rate_approved": 0.2967
+      "roc_auc": 0.6101,
+      "ks": 0.1678,
+      "brier": 0.2476,
+      "calibration_gap": 0.0546,
+      "approval_rate": 0.5595,
+      "bad_rate_approved": 0.3053,
+      "bad_rate_at_champion_approval": 0.3053,
+      "roc_auc_by_fold": [
+        0.6101,
+        0.6102
+      ]
+    },
+    "campeao_recalibrado_por_segmento": {
+      "train_rows": 3000,
+      "threshold": 0.2894,
+      "roc_auc": 0.618,
+      "ks": 0.1736,
+      "brier": 0.2528,
+      "calibration_gap": 0.0286,
+      "approval_rate": 0.542,
+      "bad_rate_approved": 0.3017,
+      "bad_rate_at_champion_approval": 0.3034,
+      "roc_auc_by_fold": [
+        0.6188,
+        0.6172
+      ]
     },
     "retreino_janela_recente": {
-      "train_rows": 6000,
-      "threshold": 0.3471,
-      "roc_auc": 0.6985,
-      "ks": 0.283,
-      "brier": 0.21,
-      "calibration_gap": 0.0199,
-      "approval_rate": 0.5833,
-      "bad_rate_approved": 0.2606
+      "train_rows": 3000,
+      "threshold": 0.3478,
+      "roc_auc": 0.6254,
+      "ks": 0.1812,
+      "brier": 0.2527,
+      "calibration_gap": 0.0321,
+      "approval_rate": 0.6048,
+      "bad_rate_approved": 0.3052,
+      "bad_rate_at_champion_approval": 0.2976,
+      "roc_auc_by_fold": [
+        0.619,
+        0.6318
+      ]
     },
     "retreino_referencia_mais_producao": {
-      "train_rows": 28989,
-      "threshold": 0.2682,
-      "roc_auc": 0.6864,
-      "ks": 0.2607,
-      "brier": 0.2174,
-      "calibration_gap": 0.0222,
-      "approval_rate": 0.4955,
-      "bad_rate_approved": 0.2644
+      "train_rows": 17989,
+      "threshold": 0.2795,
+      "roc_auc": 0.6314,
+      "ks": 0.1865,
+      "brier": 0.2443,
+      "calibration_gap": 0.0244,
+      "approval_rate": 0.5148,
+      "bad_rate_approved": 0.2939,
+      "bad_rate_at_champion_approval": 0.2994,
+      "roc_auc_by_fold": [
+        0.6294,
+        0.6334
+      ]
+    },
+    "teto_rotulos_imediatos": {
+      "train_rows": 2000,
+      "threshold": 0.3226,
+      "roc_auc": 0.6461,
+      "ks": 0.244,
+      "brier": 0.2298,
+      "calibration_gap": 0.0068,
+      "approval_rate": 0.4567,
+      "bad_rate_approved": 0.252,
+      "bad_rate_at_champion_approval": 0.2829,
+      "roc_auc_by_fold": [
+        0.6291,
+        0.663
+      ]
     }
+  },
+  "batch_size": 1000,
+  "shorter_label_lag": {
+    "model_type": "xgboost",
+    "train_months": [
+      "2025-01",
+      "2025-02",
+      "2025-03",
+      "2025-04",
+      "2025-05",
+      "2025-06",
+      "2025-07",
+      "2025-08",
+      "2025-09",
+      "2025-10"
+    ],
+    "recent_months": [
+      "2025-08",
+      "2025-09",
+      "2025-10"
+    ],
+    "test_months": [
+      "2025-11",
+      "2025-12"
+    ],
+    "label_lag_months": 1,
+    "disjoint_customers": true,
+    "folds": 2,
+    "test_rows": 4000,
+    "champion_approval_rate": 0.5595,
+    "segment_calibration_factors": {
+      "em atraso": 1.062,
+      "em dia, utilização alta": 1.574,
+      "em dia, utilização baixa": 0.897
+    },
+    "strategies": {
+      "campeao": {
+        "train_rows": 8989,
+        "threshold": 0.2894,
+        "roc_auc": 0.6101,
+        "ks": 0.1678,
+        "brier": 0.2476,
+        "calibration_gap": 0.0546,
+        "approval_rate": 0.5595,
+        "bad_rate_approved": 0.3053,
+        "bad_rate_at_champion_approval": 0.3053,
+        "roc_auc_by_fold": [
+          0.6101,
+          0.6102
+        ]
+      },
+      "campeao_recalibrado_por_segmento": {
+        "train_rows": 3000,
+        "threshold": 0.2894,
+        "roc_auc": 0.638,
+        "ks": 0.2052,
+        "brier": 0.2395,
+        "calibration_gap": 0.0133,
+        "approval_rate": 0.4813,
+        "bad_rate_approved": 0.2733,
+        "bad_rate_at_champion_approval": 0.2932,
+        "roc_auc_by_fold": [
+          0.6401,
+          0.6359
+        ]
+      },
+      "retreino_janela_recente": {
+        "train_rows": 3000,
+        "threshold": 0.3282,
+        "roc_auc": 0.6352,
+        "ks": 0.2002,
+        "brier": 0.2437,
+        "calibration_gap": 0.0175,
+        "approval_rate": 0.5495,
+        "bad_rate_approved": 0.2913,
+        "bad_rate_at_champion_approval": 0.2918,
+        "roc_auc_by_fold": [
+          0.6385,
+          0.6319
+        ]
+      },
+      "retreino_referencia_mais_producao": {
+        "train_rows": 18989,
+        "threshold": 0.2981,
+        "roc_auc": 0.638,
+        "ks": 0.2036,
+        "brier": 0.2394,
+        "calibration_gap": 0.0224,
+        "approval_rate": 0.5365,
+        "bad_rate_approved": 0.2933,
+        "bad_rate_at_champion_approval": 0.2994,
+        "roc_auc_by_fold": [
+          0.6394,
+          0.6365
+        ]
+      }
+    },
+    "batch_size": 1000
+  },
+  "strategy_labels": {
+    "campeao": "Manter o modelo atual",
+    "campeao_recalibrado_por_segmento": "Recalibrar a PD por segmento",
+    "retreino_janela_recente": "Retreinar com a janela recente",
+    "retreino_referencia_mais_producao": "Retreinar com referência + produção",
+    "teto_rotulos_imediatos": "Teto: retreino com rótulos imediatos (inviável)"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "model_version": "20261105-81a0ccd0",
+  "model_version": "20261106-81a0ccd0",
   "model_type": "xgboost",
-  "trained_at": "2026-11-05T23:48:50+00:00",
+  "trained_at": "2026-11-06T01:10:51+00:00",
   "threshold": 0.289404,
   "features": [
     "limit_bal",

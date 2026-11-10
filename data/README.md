@@ -16,12 +16,14 @@ Os dados não trazem identificador direto (nome, documento, contato). Sexo, idad
 
 | Pasta | Conteúdo | Versionado |
 |---|---|---|
-| `raw/` | Snapshot bruto da UCI (30.000 linhas). **Reprova** no contrato de dados (códigos fora do dicionário e duplicatas). | sim |
+| `raw/` | Snapshot bruto da UCI (30.000 linhas). **Reprova** no contrato de dados: 399 linhas com códigos de `education` e `marriage` fora do dicionário (regra `DQ-05`). | sim |
 | `reference/` | **Dataset de Referência**: metade do dataset limpo, com as partições `train`/`val`/`test`. É a única base usada para treinar e avaliar o modelo. | sim |
 | `production/` | **Dataset de Produção**: doze remessas mensais simuladas (`batch_<mês>.parquet`, sem rótulo), os rótulos que amadurecem depois (`labels_<mês>.parquet`), a remessa corrompida da demonstração e o `manifest.json` com o cenário de cada mês. | sim |
 | `interim/` | Metade do dataset limpo reservada para a simulação da produção; nunca é vista no treino. | não (recriado por `ingest`) |
 | `predictions/` | Score e decisão de cada proposta escorada. | não |
-| `quarantine/` | Remessas bloqueadas pelo contrato, com o relatório de validação. Pode conter dados pessoais: fora do repositório, acesso restrito, retenção curta. | não |
+| `quarantine/` | Remessas bloqueadas pelo contrato, sem as colunas que não estão no contrato, com o relatório de validação. Fora do repositório, acesso restrito, retenção curta. | não |
+
+As doze remessas são sorteadas do mesmo conjunto de 14.983 clientes: o mesmo cliente pode aparecer em mais de um mês, com outro `customer_id`. O identificador é da proposta (mês + sequencial), não da pessoa.
 
 A remessa `batch_2025-07_remessa1_corrompida.parquet` contém uma coluna `cpf` com valores **fictícios e inválidos por construção** (o dígito verificador é deslocado de propósito), usada para demonstrar o bloqueio de PII pelo esquema estrito.
 

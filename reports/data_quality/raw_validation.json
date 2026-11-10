@@ -2,7 +2,7 @@
   "batch": "raw",
   "contract": "credit_batch_with_target",
   "status": "bloqueado",
-  "validated_at": "2026-11-05T23:48:41+00:00",
+  "validated_at": "2026-11-06T01:10:28+00:00",
   "n_rows": 30000,
   "n_columns": 25,
   "rows_with_failures": 399,

@@ -1,22 +1,1167 @@
 {
+  "utilization_cut": 0.3434,
+  "scan_period": "drift_de_conceito",
+  "calibration_scan": {
+    "n_bins": 4,
+    "by_feature": [
+      {
+        "feature": "pay_status_1",
+        "spread": 0.2309,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.1762,
+        "worst_bin_share": 0.3615
+      },
+      {
+        "feature": "pay_status_2",
+        "spread": 0.1959,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.1596,
+        "worst_bin_share": 0.4096
+      },
+      {
+        "feature": "months_delayed",
+        "spread": 0.1768,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.1185,
+        "worst_bin_share": 0.4459
+      },
+      {
+        "feature": "bill_amt_1",
+        "spread": 0.1719,
+        "worst_bin": "faixa 4 de 4",
+        "worst_excess_gap": 0.0984,
+        "worst_bin_share": 0.3347
+      },
+      {
+        "feature": "max_delay",
+        "spread": 0.1602,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.1185,
+        "worst_bin_share": 0.4459
+      },
+      {
+        "feature": "pay_amt_1",
+        "spread": 0.1596,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.1187,
+        "worst_bin_share": 0.2815
+      },
+      {
+        "feature": "pay_status_3",
+        "spread": 0.155,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.1211,
+        "worst_bin_share": 0.4654
+      },
+      {
+        "feature": "utilization_1",
+        "spread": 0.1445,
+        "worst_bin": "faixa 4 de 4",
+        "worst_excess_gap": 0.098,
+        "worst_bin_share": 0.5039
+      },
+      {
+        "feature": "bill_amt_3",
+        "spread": 0.1386,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.1026,
+        "worst_bin_share": 0.3016
+      },
+      {
+        "feature": "bill_amt_2",
+        "spread": 0.1385,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.0937,
+        "worst_bin_share": 0.2828
+      },
+      {
+        "feature": "bill_trend",
+        "spread": 0.1384,
+        "worst_bin": "faixa 4 de 4",
+        "worst_excess_gap": 0.1036,
+        "worst_bin_share": 0.5497
+      },
+      {
+        "feature": "payment_ratio_avg",
+        "spread": 0.1355,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.1167,
+        "worst_bin_share": 0.2404
+      },
+      {
+        "feature": "utilization_avg",
+        "spread": 0.1262,
+        "worst_bin": "faixa 4 de 4",
+        "worst_excess_gap": 0.0904,
+        "worst_bin_share": 0.479
+      },
+      {
+        "feature": "bill_amt_4",
+        "spread": 0.1199,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.0992,
+        "worst_bin_share": 0.3251
+      },
+      {
+        "feature": "pay_amt_2",
+        "spread": 0.1109,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.1021,
+        "worst_bin_share": 0.206
+      },
+      {
+        "feature": "pay_status_4",
+        "spread": 0.1098,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.099,
+        "worst_bin_share": 0.5162
+      },
+      {
+        "feature": "pay_status_5",
+        "spread": 0.0995,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.0869,
+        "worst_bin_share": 0.546
+      },
+      {
+        "feature": "pay_amt_4",
+        "spread": 0.0855,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.106,
+        "worst_bin_share": 0.266
+      },
+      {
+        "feature": "bill_amt_6",
+        "spread": 0.0837,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.0879,
+        "worst_bin_share": 0.3074
+      },
+      {
+        "feature": "bill_amt_5",
+        "spread": 0.0818,
+        "worst_bin": "faixa 3 de 4",
+        "worst_excess_gap": 0.0855,
+        "worst_bin_share": 0.3078
+      },
+      {
+        "feature": "pay_status_6",
+        "spread": 0.0752,
+        "worst_bin": "0",
+        "worst_excess_gap": 0.0832,
+        "worst_bin_share": 0.5345
+      },
+      {
+        "feature": "limit_bal",
+        "spread": 0.0721,
+        "worst_bin": "faixa 1 de 4",
+        "worst_excess_gap": 0.0806,
+        "worst_bin_share": 0.453
+      },
+      {
+        "feature": "pay_amt_3",
+        "spread": 0.0664,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.0835,
+        "worst_bin_share": 0.2777
+      },
+      {
+        "feature": "payment_ratio_1",
+        "spread": 0.065,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.0983,
+        "worst_bin_share": 0.1775
+      },
+      {
+        "feature": "pay_amt_6",
+        "spread": 0.0517,
+        "worst_bin": "faixa 4 de 4",
+        "worst_excess_gap": 0.0731,
+        "worst_bin_share": 0.1855
+      },
+      {
+        "feature": "pay_amt_5",
+        "spread": 0.0477,
+        "worst_bin": "faixa 2 de 4",
+        "worst_excess_gap": 0.0754,
+        "worst_bin_share": 0.2804
+      }
+    ],
+    "bins": [
+      {
+        "feature": "pay_status_1",
+        "bin": "0",
+        "n": 2892,
+        "share": 0.3615,
+        "reference_gap": -0.0013,
+        "current_gap": 0.1748,
+        "excess_gap": 0.1762
+      },
+      {
+        "feature": "pay_status_2",
+        "bin": "0",
+        "n": 3277,
+        "share": 0.4096,
+        "reference_gap": -0.0001,
+        "current_gap": 0.1596,
+        "excess_gap": 0.1596
+      },
+      {
+        "feature": "pay_status_3",
+        "bin": "0",
+        "n": 3723,
+        "share": 0.4654,
+        "reference_gap": 0.0003,
+        "current_gap": 0.1214,
+        "excess_gap": 0.1211
+      },
+      {
+        "feature": "pay_amt_1",
+        "bin": "faixa 3 de 4",
+        "n": 2252,
+        "share": 0.2815,
+        "reference_gap": -0.0015,
+        "current_gap": 0.1171,
+        "excess_gap": 0.1187
+      },
+      {
+        "feature": "max_delay",
+        "bin": "0",
+        "n": 3567,
+        "share": 0.4459,
+        "reference_gap": 0.0006,
+        "current_gap": 0.1191,
+        "excess_gap": 0.1185
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "0",
+        "n": 3567,
+        "share": 0.4459,
+        "reference_gap": 0.0006,
+        "current_gap": 0.1191,
+        "excess_gap": 0.1185
+      },
+      {
+        "feature": "payment_ratio_avg",
+        "bin": "faixa 2 de 4",
+        "n": 1923,
+        "share": 0.2404,
+        "reference_gap": -0.0035,
+        "current_gap": 0.1131,
+        "excess_gap": 0.1167
+      },
+      {
+        "feature": "pay_amt_1",
+        "bin": "faixa 2 de 4",
+        "n": 1442,
+        "share": 0.1802,
+        "reference_gap": -0.0001,
+        "current_gap": 0.116,
+        "excess_gap": 0.1161
+      },
+      {
+        "feature": "pay_amt_4",
+        "bin": "faixa 2 de 4",
+        "n": 2128,
+        "share": 0.266,
+        "reference_gap": -0.0096,
+        "current_gap": 0.0963,
+        "excess_gap": 0.106
+      },
+      {
+        "feature": "bill_trend",
+        "bin": "faixa 4 de 4",
+        "n": 4398,
+        "share": 0.5497,
+        "reference_gap": -0.0016,
+        "current_gap": 0.102,
+        "excess_gap": 0.1036
+      },
+      {
+        "feature": "bill_amt_3",
+        "bin": "faixa 3 de 4",
+        "n": 2413,
+        "share": 0.3016,
+        "reference_gap": 0.0022,
+        "current_gap": 0.1048,
+        "excess_gap": 0.1026
+      },
+      {
+        "feature": "pay_amt_2",
+        "bin": "faixa 2 de 4",
+        "n": 1648,
+        "share": 0.206,
+        "reference_gap": 0.0025,
+        "current_gap": 0.1046,
+        "excess_gap": 0.1021
+      },
+      {
+        "feature": "bill_amt_4",
+        "bin": "faixa 3 de 4",
+        "n": 2601,
+        "share": 0.3251,
+        "reference_gap": -0.0008,
+        "current_gap": 0.0984,
+        "excess_gap": 0.0992
+      },
+      {
+        "feature": "pay_status_4",
+        "bin": "0",
+        "n": 4130,
+        "share": 0.5162,
+        "reference_gap": -0.006,
+        "current_gap": 0.093,
+        "excess_gap": 0.099
+      },
+      {
+        "feature": "bill_amt_1",
+        "bin": "faixa 4 de 4",
+        "n": 2678,
+        "share": 0.3347,
+        "reference_gap": -0.0056,
+        "current_gap": 0.0928,
+        "excess_gap": 0.0984
+      },
+      {
+        "feature": "payment_ratio_1",
+        "bin": "faixa 2 de 4",
+        "n": 1420,
+        "share": 0.1775,
+        "reference_gap": 0.0152,
+        "current_gap": 0.1135,
+        "excess_gap": 0.0983
+      },
+      {
+        "feature": "utilization_1",
+        "bin": "faixa 4 de 4",
+        "n": 4031,
+        "share": 0.5039,
+        "reference_gap": 0.0132,
+        "current_gap": 0.1112,
+        "excess_gap": 0.098
+      },
+      {
+        "feature": "bill_amt_2",
+        "bin": "faixa 3 de 4",
+        "n": 2262,
+        "share": 0.2828,
+        "reference_gap": -0.0005,
+        "current_gap": 0.0933,
+        "excess_gap": 0.0937
+      },
+      {
+        "feature": "pay_amt_2",
+        "bin": "faixa 3 de 4",
+        "n": 2384,
+        "share": 0.298,
+        "reference_gap": -0.0099,
+        "current_gap": 0.0808,
+        "excess_gap": 0.0907
+      },
+      {
+        "feature": "utilization_avg",
+        "bin": "faixa 4 de 4",
+        "n": 3832,
+        "share": 0.479,
+        "reference_gap": 0.0114,
+        "current_gap": 0.1018,
+        "excess_gap": 0.0904
+      },
+      {
+        "feature": "bill_amt_6",
+        "bin": "faixa 3 de 4",
+        "n": 2459,
+        "share": 0.3074,
+        "reference_gap": 0.0033,
+        "current_gap": 0.0911,
+        "excess_gap": 0.0879
+      },
+      {
+        "feature": "utilization_avg",
+        "bin": "faixa 3 de 4",
+        "n": 1427,
+        "share": 0.1784,
+        "reference_gap": -0.015,
+        "current_gap": 0.0724,
+        "excess_gap": 0.0874
+      },
+      {
+        "feature": "pay_status_5",
+        "bin": "0",
+        "n": 4368,
+        "share": 0.546,
+        "reference_gap": -0.008,
+        "current_gap": 0.0789,
+        "excess_gap": 0.0869
+      },
+      {
+        "feature": "bill_amt_2",
+        "bin": "faixa 4 de 4",
+        "n": 2515,
+        "share": 0.3144,
+        "reference_gap": -0.0005,
+        "current_gap": 0.0853,
+        "excess_gap": 0.0858
+      },
+      {
+        "feature": "bill_amt_5",
+        "bin": "faixa 3 de 4",
+        "n": 2462,
+        "share": 0.3078,
+        "reference_gap": 0.0047,
+        "current_gap": 0.0901,
+        "excess_gap": 0.0855
+      },
+      {
+        "feature": "pay_amt_3",
+        "bin": "faixa 2 de 4",
+        "n": 2222,
+        "share": 0.2777,
+        "reference_gap": -0.0023,
+        "current_gap": 0.0812,
+        "excess_gap": 0.0835
+      },
+      {
+        "feature": "pay_status_6",
+        "bin": "0",
+        "n": 4276,
+        "share": 0.5345,
+        "reference_gap": -0.0046,
+        "current_gap": 0.0786,
+        "excess_gap": 0.0832
+      },
+      {
+        "feature": "limit_bal",
+        "bin": "faixa 1 de 4",
+        "n": 3624,
+        "share": 0.453,
+        "reference_gap": -0.0044,
+        "current_gap": 0.0762,
+        "excess_gap": 0.0806
+      },
+      {
+        "feature": "bill_amt_1",
+        "bin": "faixa 3 de 4",
+        "n": 2159,
+        "share": 0.2699,
+        "reference_gap": 0.0091,
+        "current_gap": 0.0876,
+        "excess_gap": 0.0785
+      },
+      {
+        "feature": "pay_amt_5",
+        "bin": "faixa 2 de 4",
+        "n": 2243,
+        "share": 0.2804,
+        "reference_gap": 0.0005,
+        "current_gap": 0.0759,
+        "excess_gap": 0.0754
+      },
+      {
+        "feature": "pay_amt_6",
+        "bin": "faixa 4 de 4",
+        "n": 1484,
+        "share": 0.1855,
+        "reference_gap": -0.0051,
+        "current_gap": 0.068,
+        "excess_gap": 0.0731
+      },
+      {
+        "feature": "utilization_1",
+        "bin": "faixa 3 de 4",
+        "n": 1325,
+        "share": 0.1656,
+        "reference_gap": -0.0198,
+        "current_gap": 0.0508,
+        "excess_gap": 0.0706
+      },
+      {
+        "feature": "pay_amt_5",
+        "bin": "faixa 3 de 4",
+        "n": 1939,
+        "share": 0.2424,
+        "reference_gap": -0.0046,
+        "current_gap": 0.0628,
+        "excess_gap": 0.0674
+      },
+      {
+        "feature": "pay_amt_6",
+        "bin": "faixa 2 de 4",
+        "n": 2225,
+        "share": 0.2781,
+        "reference_gap": 0.0083,
+        "current_gap": 0.075,
+        "excess_gap": 0.0667
+      },
+      {
+        "feature": "bill_amt_3",
+        "bin": "faixa 4 de 4",
+        "n": 2336,
+        "share": 0.292,
+        "reference_gap": 0.0018,
+        "current_gap": 0.0672,
+        "excess_gap": 0.0654
+      },
+      {
+        "feature": "pay_amt_3",
+        "bin": "faixa 3 de 4",
+        "n": 2031,
+        "share": 0.2539,
+        "reference_gap": -0.0116,
+        "current_gap": 0.0493,
+        "excess_gap": 0.0609
+      },
+      {
+        "feature": "payment_ratio_avg",
+        "bin": "faixa 1 de 4",
+        "n": 3052,
+        "share": 0.3815,
+        "reference_gap": 0.001,
+        "current_gap": 0.0616,
+        "excess_gap": 0.0606
+      },
+      {
+        "feature": "pay_amt_1",
+        "bin": "faixa 4 de 4",
+        "n": 1592,
+        "share": 0.199,
+        "reference_gap": -0.0041,
+        "current_gap": 0.0521,
+        "excess_gap": 0.0562
+      },
+      {
+        "feature": "pay_amt_6",
+        "bin": "faixa 3 de 4",
+        "n": 1935,
+        "share": 0.2419,
+        "reference_gap": -0.0014,
+        "current_gap": 0.0526,
+        "excess_gap": 0.0541
+      },
+      {
+        "feature": "pay_amt_4",
+        "bin": "faixa 3 de 4",
+        "n": 2024,
+        "share": 0.253,
+        "reference_gap": -0.0071,
+        "current_gap": 0.0463,
+        "excess_gap": 0.0534
+      },
+      {
+        "feature": "bill_amt_1",
+        "bin": "faixa 2 de 4",
+        "n": 1677,
+        "share": 0.2096,
+        "reference_gap": -0.0216,
+        "current_gap": 0.0312,
+        "excess_gap": 0.0528
+      },
+      {
+        "feature": "bill_amt_4",
+        "bin": "faixa 4 de 4",
+        "n": 2073,
+        "share": 0.2591,
+        "reference_gap": 0.0024,
+        "current_gap": 0.0543,
+        "excess_gap": 0.0519
+      },
+      {
+        "feature": "payment_ratio_1",
+        "bin": "faixa 1 de 4",
+        "n": 3599,
+        "share": 0.4499,
+        "reference_gap": -0.0041,
+        "current_gap": 0.0463,
+        "excess_gap": 0.0503
+      },
+      {
+        "feature": "bill_amt_6",
+        "bin": "faixa 2 de 4",
+        "n": 1978,
+        "share": 0.2472,
+        "reference_gap": -0.0051,
+        "current_gap": 0.0442,
+        "excess_gap": 0.0493
+      },
+      {
+        "feature": "bill_amt_5",
+        "bin": "faixa 2 de 4",
+        "n": 1933,
+        "share": 0.2416,
+        "reference_gap": -0.0091,
+        "current_gap": 0.0396,
+        "excess_gap": 0.0487
+      },
+      {
+        "feature": "bill_amt_5",
+        "bin": "faixa 4 de 4",
+        "n": 2009,
+        "share": 0.2511,
+        "reference_gap": 0.0027,
+        "current_gap": 0.0505,
+        "excess_gap": 0.0478
+      },
+      {
+        "feature": "bill_amt_6",
+        "bin": "faixa 4 de 4",
+        "n": 1876,
+        "share": 0.2345,
+        "reference_gap": 0.0005,
+        "current_gap": 0.0472,
+        "excess_gap": 0.0467
+      },
+      {
+        "feature": "pay_amt_3",
+        "bin": "faixa 4 de 4",
+        "n": 1457,
+        "share": 0.1821,
+        "reference_gap": 0.0038,
+        "current_gap": 0.0495,
+        "excess_gap": 0.0457
+      },
+      {
+        "feature": "bill_amt_4",
+        "bin": "faixa 2 de 4",
+        "n": 1763,
+        "share": 0.2204,
+        "reference_gap": -0.0142,
+        "current_gap": 0.0298,
+        "excess_gap": 0.044
+      },
+      {
+        "feature": "pay_amt_2",
+        "bin": "faixa 4 de 4",
+        "n": 1509,
+        "share": 0.1886,
+        "reference_gap": 0.0046,
+        "current_gap": 0.043,
+        "excess_gap": 0.0384
+      },
+      {
+        "feature": "limit_bal",
+        "bin": "faixa 2 de 4",
+        "n": 2120,
+        "share": 0.265,
+        "reference_gap": 0.0045,
+        "current_gap": 0.0416,
+        "excess_gap": 0.0371
+      },
+      {
+        "feature": "bill_amt_3",
+        "bin": "faixa 2 de 4",
+        "n": 1693,
+        "share": 0.2116,
+        "reference_gap": -0.0113,
+        "current_gap": 0.0256,
+        "excess_gap": 0.0368
+      },
+      {
+        "feature": "payment_ratio_1",
+        "bin": "faixa 3 de 4",
+        "n": 2908,
+        "share": 0.3635,
+        "reference_gap": -0.0124,
+        "current_gap": 0.0209,
+        "excess_gap": 0.0333
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "1",
+        "n": 1112,
+        "share": 0.139,
+        "reference_gap": -0.0019,
+        "current_gap": 0.0277,
+        "excess_gap": 0.0296
+      },
+      {
+        "feature": "pay_amt_5",
+        "bin": "faixa 4 de 4",
+        "n": 1513,
+        "share": 0.1891,
+        "reference_gap": -0.0077,
+        "current_gap": 0.0211,
+        "excess_gap": 0.0287
+      },
+      {
+        "feature": "limit_bal",
+        "bin": "faixa 4 de 4",
+        "n": 900,
+        "share": 0.1125,
+        "reference_gap": -0.0145,
+        "current_gap": 0.014,
+        "excess_gap": 0.0285
+      },
+      {
+        "feature": "pay_amt_5",
+        "bin": "faixa 1 de 4",
+        "n": 2305,
+        "share": 0.2881,
+        "reference_gap": 0.0027,
+        "current_gap": 0.0305,
+        "excess_gap": 0.0277
+      },
+      {
+        "feature": "bill_amt_2",
+        "bin": "faixa 2 de 4",
+        "n": 1750,
+        "share": 0.2188,
+        "reference_gap": -0.0055,
+        "current_gap": 0.022,
+        "excess_gap": 0.0276
+      },
+      {
+        "feature": "pay_amt_4",
+        "bin": "faixa 4 de 4",
+        "n": 1517,
+        "share": 0.1896,
+        "reference_gap": 0.0096,
+        "current_gap": 0.0343,
+        "excess_gap": 0.0247
+      },
+      {
+        "feature": "pay_status_6",
+        "bin": "2",
+        "n": 1332,
+        "share": 0.1665,
+        "reference_gap": 0.0115,
+        "current_gap": 0.0361,
+        "excess_gap": 0.0246
+      },
+      {
+        "feature": "pay_amt_6",
+        "bin": "faixa 1 de 4",
+        "n": 2356,
+        "share": 0.2945,
+        "reference_gap": -0.011,
+        "current_gap": 0.0103,
+        "excess_gap": 0.0214
+      },
+      {
+        "feature": "pay_amt_4",
+        "bin": "faixa 1 de 4",
+        "n": 2331,
+        "share": 0.2914,
+        "reference_gap": -0.0018,
+        "current_gap": 0.0186,
+        "excess_gap": 0.0205
+      },
+      {
+        "feature": "pay_amt_3",
+        "bin": "faixa 1 de 4",
+        "n": 2290,
+        "share": 0.2863,
+        "reference_gap": 0.001,
+        "current_gap": 0.0181,
+        "excess_gap": 0.0171
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "2",
+        "n": 856,
+        "share": 0.107,
+        "reference_gap": -0.0339,
+        "current_gap": -0.0184,
+        "excess_gap": 0.0156
+      },
+      {
+        "feature": "pay_status_5",
+        "bin": "-2",
+        "n": 881,
+        "share": 0.1101,
+        "reference_gap": -0.0004,
+        "current_gap": 0.013,
+        "excess_gap": 0.0134
+      },
+      {
+        "feature": "pay_status_5",
+        "bin": "2",
+        "n": 1382,
+        "share": 0.1727,
+        "reference_gap": 0.0117,
+        "current_gap": 0.0245,
+        "excess_gap": 0.0128
+      },
+      {
+        "feature": "pay_status_1",
+        "bin": "-1",
+        "n": 1005,
+        "share": 0.1256,
+        "reference_gap": 0.0012,
+        "current_gap": 0.0132,
+        "excess_gap": 0.012
+      },
+      {
+        "feature": "pay_status_6",
+        "bin": "-1",
+        "n": 1058,
+        "share": 0.1323,
+        "reference_gap": -0.0043,
+        "current_gap": 0.0074,
+        "excess_gap": 0.0118
+      },
+      {
+        "feature": "pay_status_4",
+        "bin": "2",
+        "n": 1629,
+        "share": 0.2036,
+        "reference_gap": -0.0223,
+        "current_gap": -0.0131,
+        "excess_gap": 0.0091
+      },
+      {
+        "feature": "max_delay",
+        "bin": "2",
+        "n": 2972,
+        "share": 0.3715,
+        "reference_gap": -0.014,
+        "current_gap": -0.0049,
+        "excess_gap": 0.0091
+      },
+      {
+        "feature": "limit_bal",
+        "bin": "faixa 3 de 4",
+        "n": 1356,
+        "share": 0.1695,
+        "reference_gap": 0.0042,
+        "current_gap": 0.0128,
+        "excess_gap": 0.0085
+      },
+      {
+        "feature": "pay_status_3",
+        "bin": "2",
+        "n": 2008,
+        "share": 0.251,
+        "reference_gap": -0.0318,
+        "current_gap": -0.0238,
+        "excess_gap": 0.008
+      },
+      {
+        "feature": "pay_status_6",
+        "bin": "-2",
+        "n": 1012,
+        "share": 0.1265,
+        "reference_gap": -0.0027,
+        "current_gap": 0.0053,
+        "excess_gap": 0.008
+      },
+      {
+        "feature": "payment_ratio_avg",
+        "bin": "faixa 3 de 4",
+        "n": 2378,
+        "share": 0.2973,
+        "reference_gap": -0.0058,
+        "current_gap": 0.0005,
+        "excess_gap": 0.0063
+      },
+      {
+        "feature": "bill_amt_6",
+        "bin": "faixa 1 de 4",
+        "n": 1687,
+        "share": 0.2109,
+        "reference_gap": -0.0077,
+        "current_gap": -0.0036,
+        "excess_gap": 0.0042
+      },
+      {
+        "feature": "bill_amt_5",
+        "bin": "faixa 1 de 4",
+        "n": 1596,
+        "share": 0.1995,
+        "reference_gap": -0.0074,
+        "current_gap": -0.0037,
+        "excess_gap": 0.0037
+      },
+      {
+        "feature": "bill_trend",
+        "bin": "faixa 3 de 4",
+        "n": 1919,
+        "share": 0.2399,
+        "reference_gap": -0.01,
+        "current_gap": -0.0083,
+        "excess_gap": 0.0017
+      },
+      {
+        "feature": "pay_status_2",
+        "bin": "-1",
+        "n": 1022,
+        "share": 0.1278,
+        "reference_gap": -0.0017,
+        "current_gap": -0.0016,
+        "excess_gap": 0.0001
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "6",
+        "n": 1078,
+        "share": 0.1348,
+        "reference_gap": 0.0028,
+        "current_gap": 0.0019,
+        "excess_gap": -0.0009
+      },
+      {
+        "feature": "pay_status_4",
+        "bin": "-1",
+        "n": 1034,
+        "share": 0.1293,
+        "reference_gap": 0.0028,
+        "current_gap": -0.0005,
+        "excess_gap": -0.0033
+      },
+      {
+        "feature": "pay_status_1",
+        "bin": "1",
+        "n": 1521,
+        "share": 0.1901,
+        "reference_gap": -0.0305,
+        "current_gap": -0.0374,
+        "excess_gap": -0.0069
+      },
+      {
+        "feature": "pay_amt_2",
+        "bin": "faixa 1 de 4",
+        "n": 2459,
+        "share": 0.3074,
+        "reference_gap": -0.0058,
+        "current_gap": -0.0146,
+        "excess_gap": -0.0088
+      },
+      {
+        "feature": "pay_status_4",
+        "bin": "-2",
+        "n": 845,
+        "share": 0.1056,
+        "reference_gap": 0.0092,
+        "current_gap": -0.0016,
+        "excess_gap": -0.0108
+      },
+      {
+        "feature": "bill_trend",
+        "bin": "faixa 1 de 4",
+        "n": 685,
+        "share": 0.0856,
+        "reference_gap": -0.0069,
+        "current_gap": -0.0191,
+        "excess_gap": -0.0122
+      },
+      {
+        "feature": "pay_status_5",
+        "bin": "-1",
+        "n": 1019,
+        "share": 0.1274,
+        "reference_gap": 0.0012,
+        "current_gap": -0.0114,
+        "excess_gap": -0.0126
+      },
+      {
+        "feature": "max_delay",
+        "bin": "3",
+        "n": 565,
+        "share": 0.0706,
+        "reference_gap": -0.0043,
+        "current_gap": -0.0195,
+        "excess_gap": -0.0151
+      },
+      {
+        "feature": "payment_ratio_avg",
+        "bin": "faixa 4 de 4",
+        "n": 647,
+        "share": 0.0809,
+        "reference_gap": -0.0008,
+        "current_gap": -0.0195,
+        "excess_gap": -0.0188
+      },
+      {
+        "feature": "bill_amt_4",
+        "bin": "faixa 1 de 4",
+        "n": 1563,
+        "share": 0.1954,
+        "reference_gap": 0.0035,
+        "current_gap": -0.0171,
+        "excess_gap": -0.0207
+      },
+      {
+        "feature": "pay_status_1",
+        "bin": "-2",
+        "n": 435,
+        "share": 0.0544,
+        "reference_gap": 0.0059,
+        "current_gap": -0.015,
+        "excess_gap": -0.0209
+      },
+      {
+        "feature": "pay_status_3",
+        "bin": "-1",
+        "n": 1096,
+        "share": 0.137,
+        "reference_gap": 0.0042,
+        "current_gap": -0.0169,
+        "excess_gap": -0.021
+      },
+      {
+        "feature": "pay_status_2",
+        "bin": "2",
+        "n": 2458,
+        "share": 0.3073,
+        "reference_gap": -0.0232,
+        "current_gap": -0.0531,
+        "excess_gap": -0.0298
+      },
+      {
+        "feature": "utilization_avg",
+        "bin": "faixa 2 de 4",
+        "n": 1483,
+        "share": 0.1854,
+        "reference_gap": -0.0043,
+        "current_gap": -0.0357,
+        "excess_gap": -0.0314
+      },
+      {
+        "feature": "pay_status_3",
+        "bin": "-2",
+        "n": 741,
+        "share": 0.0926,
+        "reference_gap": 0.0049,
+        "current_gap": -0.0289,
+        "excess_gap": -0.0339
+      },
+      {
+        "feature": "bill_trend",
+        "bin": "faixa 2 de 4",
+        "n": 998,
+        "share": 0.1247,
+        "reference_gap": 0.0094,
+        "current_gap": -0.0253,
+        "excess_gap": -0.0348
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "4",
+        "n": 530,
+        "share": 0.0663,
+        "reference_gap": 0.0112,
+        "current_gap": -0.0243,
+        "excess_gap": -0.0356
+      },
+      {
+        "feature": "utilization_avg",
+        "bin": "faixa 1 de 4",
+        "n": 1258,
+        "share": 0.1573,
+        "reference_gap": -0.0012,
+        "current_gap": -0.037,
+        "excess_gap": -0.0358
+      },
+      {
+        "feature": "bill_amt_3",
+        "bin": "faixa 1 de 4",
+        "n": 1558,
+        "share": 0.1948,
+        "reference_gap": -0.0019,
+        "current_gap": -0.038,
+        "excess_gap": -0.036
+      },
+      {
+        "feature": "pay_status_2",
+        "bin": "-2",
+        "n": 675,
+        "share": 0.0844,
+        "reference_gap": -0.0008,
+        "current_gap": -0.0371,
+        "excess_gap": -0.0363
+      },
+      {
+        "feature": "pay_amt_1",
+        "bin": "faixa 1 de 4",
+        "n": 2714,
+        "share": 0.3392,
+        "reference_gap": -0.0033,
+        "current_gap": -0.0442,
+        "excess_gap": -0.0409
+      },
+      {
+        "feature": "max_delay",
+        "bin": "1",
+        "n": 381,
+        "share": 0.0476,
+        "reference_gap": -0.0116,
+        "current_gap": -0.0533,
+        "excess_gap": -0.0417
+      },
+      {
+        "feature": "utilization_1",
+        "bin": "faixa 2 de 4",
+        "n": 1377,
+        "share": 0.1721,
+        "reference_gap": -0.0035,
+        "current_gap": -0.0462,
+        "excess_gap": -0.0428
+      },
+      {
+        "feature": "bill_amt_2",
+        "bin": "faixa 1 de 4",
+        "n": 1473,
+        "share": 0.1841,
+        "reference_gap": -0.0026,
+        "current_gap": -0.0474,
+        "excess_gap": -0.0448
+      },
+      {
+        "feature": "utilization_1",
+        "bin": "faixa 1 de 4",
+        "n": 1267,
+        "share": 0.1584,
+        "reference_gap": 0.0009,
+        "current_gap": -0.0457,
+        "excess_gap": -0.0465
+      },
+      {
+        "feature": "pay_status_1",
+        "bin": "2",
+        "n": 1575,
+        "share": 0.1969,
+        "reference_gap": 0.0166,
+        "current_gap": -0.0381,
+        "excess_gap": -0.0547
+      },
+      {
+        "feature": "months_delayed",
+        "bin": "3",
+        "n": 593,
+        "share": 0.0741,
+        "reference_gap": -0.0114,
+        "current_gap": -0.0696,
+        "excess_gap": -0.0583
+      },
+      {
+        "feature": "bill_amt_1",
+        "bin": "faixa 1 de 4",
+        "n": 1486,
+        "share": 0.1857,
+        "reference_gap": 0.0089,
+        "current_gap": -0.0646,
+        "excess_gap": -0.0735
+      }
+    ]
+  },
   "segments": [
     {
       "period": "referencia",
-      "segment": "em dia, baixa utilização",
-      "n": 2723,
-      "share": 0.4544,
-      "observed_default_rate": 0.1348,
-      "predicted_default_rate": 0.1377,
-      "gap": -0.0029
+      "segment": "em dia, utilização baixa",
+      "n": 2397,
+      "share": 0.4,
+      "observed_default_rate": 0.1389,
+      "predicted_default_rate": 0.1403,
+      "gap": -0.0014
     },
     {
       "period": "referencia",
-      "segment": "em dia, alavancado",
-      "n": 1903,
-      "share": 0.3175,
-      "observed_default_rate": 0.1445,
-      "predicted_default_rate": 0.1402,
-      "gap": 0.0043
+      "segment": "em dia, utilização alta",
+      "n": 2229,
+      "share": 0.3719,
+      "observed_default_rate": 0.1386,
+      "predicted_default_rate": 0.137,
+      "gap": 0.0017
     },
     {
       "period": "referencia",
@@ -29,155 +1174,155 @@
     },
     {
       "period": "estavel",
-      "segment": "em dia, baixa utilização",
-      "n": 2749,
-      "share": 0.4582,
-      "observed_default_rate": 0.1124,
-      "predicted_default_rate": 0.132,
-      "gap": -0.0196
+      "segment": "em dia, utilização baixa",
+      "n": 2481,
+      "share": 0.4135,
+      "observed_default_rate": 0.1254,
+      "predicted_default_rate": 0.1362,
+      "gap": -0.0108
     },
     {
       "period": "estavel",
-      "segment": "em dia, alavancado",
-      "n": 1886,
-      "share": 0.3143,
-      "observed_default_rate": 0.1575,
-      "predicted_default_rate": 0.1402,
-      "gap": 0.0173
+      "segment": "em dia, utilização alta",
+      "n": 2189,
+      "share": 0.3648,
+      "observed_default_rate": 0.1599,
+      "predicted_default_rate": 0.1358,
+      "gap": 0.024
     },
     {
       "period": "estavel",
       "segment": "em atraso",
-      "n": 1365,
-      "share": 0.2275,
-      "observed_default_rate": 0.4967,
-      "predicted_default_rate": 0.4936,
-      "gap": 0.0031
+      "n": 1330,
+      "share": 0.2217,
+      "observed_default_rate": 0.5038,
+      "predicted_default_rate": 0.5019,
+      "gap": 0.0019
     },
     {
       "period": "drift_de_dados",
-      "segment": "em dia, baixa utilização",
-      "n": 3398,
-      "share": 0.3398,
-      "observed_default_rate": 0.1351,
-      "predicted_default_rate": 0.1378,
-      "gap": -0.0028
+      "segment": "em dia, utilização baixa",
+      "n": 3077,
+      "share": 0.3077,
+      "observed_default_rate": 0.1313,
+      "predicted_default_rate": 0.1433,
+      "gap": -0.012
     },
     {
       "period": "drift_de_dados",
-      "segment": "em dia, alavancado",
-      "n": 3036,
-      "share": 0.3036,
-      "observed_default_rate": 0.1535,
-      "predicted_default_rate": 0.1527,
-      "gap": 0.0008
+      "segment": "em dia, utilização alta",
+      "n": 3358,
+      "share": 0.3358,
+      "observed_default_rate": 0.151,
+      "predicted_default_rate": 0.149,
+      "gap": 0.002
     },
     {
       "period": "drift_de_dados",
       "segment": "em atraso",
-      "n": 3566,
-      "share": 0.3566,
-      "observed_default_rate": 0.5656,
-      "predicted_default_rate": 0.5101,
-      "gap": 0.0555
+      "n": 3565,
+      "share": 0.3565,
+      "observed_default_rate": 0.5487,
+      "predicted_default_rate": 0.5018,
+      "gap": 0.0468
     },
     {
       "period": "drift_de_conceito",
-      "segment": "em dia, baixa utilização",
-      "n": 1941,
-      "share": 0.2426,
-      "observed_default_rate": 0.1484,
-      "predicted_default_rate": 0.1538,
-      "gap": -0.0054
+      "segment": "em dia, utilização baixa",
+      "n": 1725,
+      "share": 0.2156,
+      "observed_default_rate": 0.1467,
+      "predicted_default_rate": 0.1595,
+      "gap": -0.0129
     },
     {
       "period": "drift_de_conceito",
-      "segment": "em dia, alavancado",
-      "n": 2337,
-      "share": 0.2921,
-      "observed_default_rate": 0.371,
-      "predicted_default_rate": 0.1572,
-      "gap": 0.2138
+      "segment": "em dia, utilização alta",
+      "n": 2607,
+      "share": 0.3259,
+      "observed_default_rate": 0.3606,
+      "predicted_default_rate": 0.1555,
+      "gap": 0.205
     },
     {
       "period": "drift_de_conceito",
       "segment": "em atraso",
-      "n": 3722,
-      "share": 0.4652,
-      "observed_default_rate": 0.4702,
-      "predicted_default_rate": 0.5001,
-      "gap": -0.03
+      "n": 3668,
+      "share": 0.4585,
+      "observed_default_rate": 0.4676,
+      "predicted_default_rate": 0.4998,
+      "gap": -0.0322
     }
   ],
   "root_cause_ranking": [
     {
       "feature": "max_delay",
-      "psi": 0.27876,
+      "psi": 0.25044,
       "importance": 0.26508,
-      "impact": 0.07389,
+      "impact": 0.06639,
       "severity": "critical"
     },
     {
       "feature": "pay_status_1",
-      "psi": 0.30167,
+      "psi": 0.26309,
       "importance": 0.19007,
-      "impact": 0.05734,
+      "impact": 0.05001,
       "severity": "critical"
     },
     {
       "feature": "months_delayed",
-      "psi": 0.29141,
+      "psi": 0.26061,
       "importance": 0.1665,
-      "impact": 0.04852,
+      "impact": 0.04339,
       "severity": "critical"
     },
     {
       "feature": "utilization_1",
-      "psi": 0.90483,
+      "psi": 0.81276,
       "importance": 0.01772,
-      "impact": 0.01603,
+      "impact": 0.0144,
       "severity": "critical"
     },
     {
       "feature": "utilization_avg",
-      "psi": 0.56968,
+      "psi": 0.49116,
       "importance": 0.01893,
-      "impact": 0.01078,
-      "severity": "critical"
-    },
-    {
-      "feature": "pay_status_2",
-      "psi": 0.34392,
-      "importance": 0.03092,
-      "impact": 0.01063,
+      "impact": 0.0093,
       "severity": "critical"
     },
     {
       "feature": "bill_trend",
-      "psi": 0.65827,
+      "psi": 0.60501,
       "importance": 0.0144,
-      "impact": 0.00948,
+      "impact": 0.00871,
+      "severity": "critical"
+    },
+    {
+      "feature": "pay_status_2",
+      "psi": 0.27387,
+      "importance": 0.03092,
+      "impact": 0.00847,
       "severity": "critical"
     },
     {
       "feature": "payment_ratio_1",
-      "psi": 0.51893,
+      "psi": 0.5042,
       "importance": 0.01553,
-      "impact": 0.00806,
+      "impact": 0.00783,
       "severity": "critical"
     },
     {
       "feature": "payment_ratio_avg",
-      "psi": 0.38713,
+      "psi": 0.39228,
       "importance": 0.01397,
-      "impact": 0.00541,
+      "impact": 0.00548,
       "severity": "critical"
     },
     {
       "feature": "pay_status_3",
-      "psi": 0.20821,
+      "psi": 0.18339,
       "importance": 0.02265,
-      "impact": 0.00472,
+      "impact": 0.00415,
       "severity": "warning"
     }
   ]

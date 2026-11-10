@@ -1,11 +1,11 @@
 {
-  "model_version": "20261105-81a0ccd0",
+  "model_version": "20261106-81a0ccd0",
   "selected": "xgboost",
   "threshold": 0.289404,
   "candidates": [
     {
       "name": "logreg",
-      "fit_seconds": 0.05,
+      "fit_seconds": 0.06,
       "validation": {
         "n": 2996,
         "roc_auc": 0.76043,
@@ -25,7 +25,7 @@
     },
     {
       "name": "xgboost",
-      "fit_seconds": 0.69,
+      "fit_seconds": 0.84,
       "validation": {
         "n": 2996,
         "roc_auc": 0.77353,

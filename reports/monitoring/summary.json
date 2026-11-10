@@ -1,21 +1,21 @@
 {
-  "model_version": "20261105-81a0ccd0",
+  "model_version": "20261106-81a0ccd0",
   "threshold": 0.289404,
   "reference_metrics": {
-    "n": 5993,
-    "roc_auc": 0.7767231235260829,
-    "gini": 0.5534462470521657,
-    "ks": 0.4320384678405324,
-    "pr_auc": 0.5528599685004247,
-    "brier": 0.13615753716539525,
-    "precision": 0.5156146179401994,
-    "recall": 0.5852187028657617,
-    "f1": 0.548216178028965,
-    "default_rate": 0.22125813449023862,
-    "mean_score": 0.22353940225106392,
-    "calibration_gap": -0.002281267760825295,
-    "approval_rate": 0.7488736859669615,
-    "bad_rate_approved": 0.12254901960784313
+    "n": 2997,
+    "roc_auc": 0.7800108178529469,
+    "gini": 0.5600216357058938,
+    "ks": 0.4451197524689132,
+    "pr_auc": 0.5617835336040833,
+    "brier": 0.13486854455472697,
+    "precision": 0.5149934810951761,
+    "recall": 0.5957767722473605,
+    "f1": 0.5524475524475524,
+    "default_rate": 0.22122122122122123,
+    "mean_score": 0.22646593576726623,
+    "calibration_gap": -0.005244714546044998,
+    "approval_rate": 0.7440774107440774,
+    "bad_rate_approved": 0.12017937219730941
   },
   "deliveries": 13,
   "scored": 12,
@@ -23,32 +23,33 @@
   "rows_scored": 24000,
   "rows_quarantined": 2040,
   "alerts": {
-    "total": 29,
-    "critical": 18,
-    "warning": 11,
+    "total": 28,
+    "critical": 20,
+    "warning": 8,
     "by_kind": {
       "data_drift": 9,
       "target_drift": 7,
       "prediction_drift": 6,
-      "performance": 4,
+      "performance": 3,
       "calibration": 2,
       "data_quality": 1
     }
   },
   "first_drift_alert": "2025-04",
-  "first_performance_alert": "2025-09",
+  "first_performance_alert": "2025-10",
   "evidently_reports": [
     "evidently/drift_2025-03.html",
     "evidently/drift_2025-08.html",
     "evidently/drift_2025-12.html"
   ],
   "pipeline": {
-    "run_id": "20261105T234841-9dd2ebb9",
+    "run_id": "20261106T011028-c9ccd676",
     "pipeline": "monitor",
     "stages": 66,
     "success": 65,
     "failed": 0,
     "blocked": 1,
-    "duration_ms": 16207.05
+    "duration_ms": 20534.18,
+    "cpu_ms": 16796.83
   }
 }

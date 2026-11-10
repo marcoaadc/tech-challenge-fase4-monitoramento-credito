@@ -1,0 +1,146 @@
+{
+  "tracking_uri": "sqlite:///mlflow.db",
+  "experiments": [
+    {
+      "name": "creditwatch-treino",
+      "runs": 3,
+      "parent_runs": 1,
+      "items": [
+        {
+          "run_name": "treino-20261106-81a0ccd0",
+          "nested": false,
+          "status": "FINISHED",
+          "metrics": 14,
+          "params": 15
+        },
+        {
+          "run_name": "logreg",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 15,
+          "params": 2
+        },
+        {
+          "run_name": "xgboost",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 15,
+          "params": 9
+        }
+      ]
+    },
+    {
+      "name": "creditwatch-monitoramento",
+      "runs": 14,
+      "parent_runs": 1,
+      "items": [
+        {
+          "run_name": "monitoramento-20261106-81a0ccd0",
+          "nested": false,
+          "status": "FINISHED",
+          "metrics": 71,
+          "params": 7
+        },
+        {
+          "run_name": "2025-01",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-02",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-03",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-04",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-05",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-06",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-07-r1",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 5,
+          "params": 6
+        },
+        {
+          "run_name": "2025-07-r2",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-08",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-09",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-10",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-11",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        },
+        {
+          "run_name": "2025-12",
+          "nested": true,
+          "status": "FINISHED",
+          "metrics": 57,
+          "params": 6
+        }
+      ]
+    }
+  ],
+  "registered_models": [
+    {
+      "name": "credit-scoring-baseline",
+      "versions": [
+        1
+      ]
+    }
+  ]
+}

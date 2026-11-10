@@ -12,134 +12,236 @@
     "education",
     "marriage"
   ],
+  "largest_equal_opportunity_gap": {
+    "period": "drift_de_conceito",
+    "attribute": "education",
+    "group": "ensino médio",
+    "equal_opportunity_gap": 0.1321
+  },
   "worst_groups": [
     {
       "period": "referencia",
       "attribute": "sex",
       "group": "masculino",
+      "n": 2400,
       "disparate_impact": 0.9373,
+      "disparate_impact_ci": [
+        0.9089,
+        0.9666
+      ],
       "equal_opportunity_gap": 0.0182,
-      "adverse_impact": false
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "referencia",
       "attribute": "age_band",
       "group": "18-29",
+      "n": 2009,
       "disparate_impact": 0.9483,
+      "disparate_impact_ci": [
+        0.9155,
+        0.9823
+      ],
       "equal_opportunity_gap": 0.0279,
-      "adverse_impact": false
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "referencia",
       "attribute": "education",
       "group": "ensino médio",
+      "n": 985,
       "disparate_impact": 0.8742,
+      "disparate_impact_ci": [
+        0.8338,
+        0.9166
+      ],
       "equal_opportunity_gap": 0.0896,
-      "adverse_impact": false
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "referencia",
       "attribute": "marriage",
       "group": "casado(a)",
+      "n": 2684,
       "disparate_impact": 0.9802,
+      "disparate_impact_ci": [
+        0.9515,
+        1.0097
+      ],
       "equal_opportunity_gap": 0.0106,
-      "adverse_impact": false
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "estavel",
       "attribute": "sex",
       "group": "masculino",
-      "disparate_impact": 0.9572,
-      "equal_opportunity_gap": 0.0295,
-      "adverse_impact": false
+      "n": 2311,
+      "disparate_impact": 0.9542,
+      "disparate_impact_ci": [
+        0.926,
+        0.9832
+      ],
+      "equal_opportunity_gap": 0.0229,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "estavel",
       "attribute": "age_band",
-      "group": "18-29",
-      "disparate_impact": 0.9315,
-      "equal_opportunity_gap": 0.046,
-      "adverse_impact": false
+      "group": "50+",
+      "n": 543,
+      "disparate_impact": 0.9275,
+      "disparate_impact_ci": [
+        0.8769,
+        0.9809
+      ],
+      "equal_opportunity_gap": 0.0248,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "estavel",
       "attribute": "education",
-      "group": "ensino médio",
-      "disparate_impact": 0.8554,
-      "equal_opportunity_gap": 0.0763,
-      "adverse_impact": false
+      "group": "graduação",
+      "n": 2783,
+      "disparate_impact": 0.904,
+      "disparate_impact_ci": [
+        0.8765,
+        0.9323
+      ],
+      "equal_opportunity_gap": 0.0502,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "estavel",
       "attribute": "marriage",
       "group": "casado(a)",
-      "disparate_impact": 0.9921,
-      "equal_opportunity_gap": 0.0,
-      "adverse_impact": false
+      "n": 2781,
+      "disparate_impact": 0.9573,
+      "disparate_impact_ci": [
+        0.93,
+        0.9853
+      ],
+      "equal_opportunity_gap": 0.0124,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_dados",
       "attribute": "sex",
       "group": "masculino",
-      "disparate_impact": 0.9446,
-      "equal_opportunity_gap": 0.0308,
-      "adverse_impact": false
+      "n": 4044,
+      "disparate_impact": 0.9498,
+      "disparate_impact_ci": [
+        0.9219,
+        0.9785
+      ],
+      "equal_opportunity_gap": 0.027,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_dados",
       "attribute": "age_band",
       "group": "18-29",
-      "disparate_impact": 0.9125,
-      "equal_opportunity_gap": 0.0486,
-      "adverse_impact": false
+      "n": 3759,
+      "disparate_impact": 0.9114,
+      "disparate_impact_ci": [
+        0.8812,
+        0.9426
+      ],
+      "equal_opportunity_gap": 0.038,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_dados",
       "attribute": "education",
       "group": "ensino médio",
-      "disparate_impact": 0.8341,
-      "equal_opportunity_gap": 0.0832,
-      "adverse_impact": false
+      "n": 1643,
+      "disparate_impact": 0.8325,
+      "disparate_impact_ci": [
+        0.7955,
+        0.8712
+      ],
+      "equal_opportunity_gap": 0.0984,
+      "adverse_impact": false,
+      "verdict": "inconclusivo"
     },
     {
       "period": "drift_de_dados",
       "attribute": "marriage",
       "group": "casado(a)",
-      "disparate_impact": 0.998,
+      "n": 4286,
+      "disparate_impact": 0.9963,
+      "disparate_impact_ci": [
+        0.9677,
+        1.0259
+      ],
       "equal_opportunity_gap": 0.0,
-      "adverse_impact": false
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_conceito",
       "attribute": "sex",
       "group": "masculino",
-      "disparate_impact": 0.9124,
-      "equal_opportunity_gap": 0.0584,
-      "adverse_impact": false
+      "n": 3316,
+      "disparate_impact": 0.9148,
+      "disparate_impact_ci": [
+        0.8789,
+        0.9521
+      ],
+      "equal_opportunity_gap": 0.0514,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_conceito",
       "attribute": "age_band",
       "group": "50+",
-      "disparate_impact": 0.8353,
-      "equal_opportunity_gap": 0.0703,
-      "adverse_impact": false
+      "n": 330,
+      "disparate_impact": 0.9108,
+      "disparate_impact_ci": [
+        0.8187,
+        1.0131
+      ],
+      "equal_opportunity_gap": 0.065,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     },
     {
       "period": "drift_de_conceito",
       "attribute": "education",
-      "group": "graduação",
-      "disparate_impact": 0.8387,
-      "equal_opportunity_gap": 0.1075,
-      "adverse_impact": false
+      "group": "ensino médio",
+      "n": 1318,
+      "disparate_impact": 0.8212,
+      "disparate_impact_ci": [
+        0.7727,
+        0.8729
+      ],
+      "equal_opportunity_gap": 0.1321,
+      "adverse_impact": false,
+      "verdict": "inconclusivo"
     },
     {
       "period": "drift_de_conceito",
       "attribute": "marriage",
-      "group": "casado(a)",
-      "disparate_impact": 0.9604,
-      "equal_opportunity_gap": 0.0,
-      "adverse_impact": false
+      "group": "solteiro(a)",
+      "n": 4915,
+      "disparate_impact": 0.9955,
+      "disparate_impact_ci": [
+        0.9563,
+        1.0362
+      ],
+      "equal_opportunity_gap": 0.0154,
+      "adverse_impact": false,
+      "verdict": "dentro do limite"
     }
   ],
   "by_period": {
@@ -148,535 +250,879 @@
         "attribute": "sex",
         "group": "feminino",
         "n": 3593,
+        "compared": true,
         "approval_rate": 0.768160311717228,
         "approval_rate_good_payers": 0.8508403361344538,
         "default_rate": 0.20512106874478153,
         "mean_score": 0.2148391455411911,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "sex",
         "group": "masculino",
         "n": 2400,
+        "compared": true,
         "approval_rate": 0.72,
         "approval_rate_good_payers": 0.8326891220320265,
         "default_rate": 0.24541666666666667,
         "mean_score": 0.23656442761421204,
         "disparate_impact": 0.9373043478260868,
+        "disparate_impact_ci": [
+          0.9089271057536055,
+          0.9665675441874685
+        ],
         "equal_opportunity_gap": 0.01815121410242726,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "18-29",
         "n": 2009,
+        "compared": true,
         "approval_rate": 0.7282229965156795,
         "approval_rate_good_payers": 0.8327911515940143,
         "default_rate": 0.2349427575908412,
         "mean_score": 0.23715732991695404,
         "disparate_impact": 0.9483138669414863,
+        "disparate_impact_ci": [
+          0.915542682882831,
+          0.9822580716846875
+        ],
         "equal_opportunity_gap": 0.027915709112846465,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "30-39",
         "n": 2219,
+        "compared": true,
         "approval_rate": 0.7679134745380802,
         "approval_rate_good_payers": 0.8474191718661372,
         "default_rate": 0.20549797205948625,
         "mean_score": 0.2083863466978073,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.01328768884072351,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "40-49",
         "n": 1235,
+        "compared": true,
         "approval_rate": 0.7562753036437248,
         "approval_rate_good_payers": 0.8607068607068608,
         "default_rate": 0.22105263157894736,
         "mean_score": 0.22080369293689728,
         "disparate_impact": 0.9848444241698504,
+        "disparate_impact_ci": [
+          0.9471186616707199,
+          1.0240728844973928
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "50+",
         "n": 530,
+        "compared": true,
         "approval_rate": 0.730188679245283,
         "approval_rate_good_payers": 0.8296296296296296,
         "default_rate": 0.2358490566037736,
         "mean_score": 0.24173715710639954,
         "disparate_impact": 0.9508736380547435,
+        "disparate_impact_ci": [
+          0.8985658945152792,
+          1.006226344741475
+        ],
         "equal_opportunity_gap": 0.03107723107723115,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "ensino médio",
         "n": 985,
+        "compared": true,
         "approval_rate": 0.6893401015228426,
         "approval_rate_good_payers": 0.7904509283819628,
         "default_rate": 0.23451776649746192,
         "mean_score": 0.25743749737739563,
         "disparate_impact": 0.8742347882514905,
+        "disparate_impact_ci": [
+          0.83379682291951,
+          0.9166339376456322
+        ],
         "equal_opportunity_gap": 0.08961961835525056,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "graduação",
         "n": 2792,
+        "compared": true,
         "approval_rate": 0.7335243553008596,
         "approval_rate_good_payers": 0.8302773859896568,
         "default_rate": 0.23818051575931232,
         "mean_score": 0.2343827337026596,
         "disparate_impact": 0.9302701351874104,
+        "disparate_impact_ci": [
+          0.9015249586527669,
+          0.959931853373039
+        ],
         "equal_opportunity_gap": 0.049793160747556575,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "education",
+        "group": "outros",
+        "n": 93,
+        "compared": false,
+        "approval_rate": 0.9354838709677419,
+        "approval_rate_good_payers": 0.9294117647058824,
+        "default_rate": 0.08602150537634409,
+        "mean_score": 0.15561211109161377
       },
       {
         "attribute": "education",
         "group": "pós-graduação",
         "n": 2123,
+        "compared": true,
         "approval_rate": 0.7885068299576071,
         "approval_rate_good_payers": 0.8800705467372134,
         "default_rate": 0.1987753179463024,
         "mean_score": 0.1965271681547165,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "marriage",
         "group": "casado(a)",
         "n": 2684,
+        "compared": true,
         "approval_rate": 0.7414307004470939,
         "approval_rate_good_payers": 0.8384615384615385,
         "default_rate": 0.22503725782414308,
         "mean_score": 0.22648490965366364,
         "disparate_impact": 0.9801913837132606,
+        "disparate_impact_ci": [
+          0.9515166665995537,
+          1.0097302364016914
+        ],
         "equal_opportunity_gap": 0.010550319245971385,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "marriage",
+        "group": "outros",
+        "n": 74,
+        "compared": false,
+        "approval_rate": 0.6891891891891891,
+        "approval_rate_good_payers": 0.8070175438596491,
+        "default_rate": 0.22972972972972974,
+        "mean_score": 0.25105974078178406
       },
       {
         "attribute": "marriage",
         "group": "solteiro(a)",
         "n": 3235,
+        "compared": true,
         "approval_rate": 0.7564142194744977,
         "approval_rate_good_payers": 0.8490118577075099,
         "default_rate": 0.21792890262751158,
         "mean_score": 0.22046604752540588,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       }
     ],
     "estavel": [
       {
         "attribute": "sex",
         "group": "feminino",
-        "n": 3628,
-        "approval_rate": 0.7778390297684675,
-        "approval_rate_good_payers": 0.8647442499141779,
-        "default_rate": 0.19707828004410144,
-        "mean_score": 0.2091095745563507,
+        "n": 3689,
+        "compared": true,
+        "approval_rate": 0.7722960151802657,
+        "approval_rate_good_payers": 0.857338351009237,
+        "default_rate": 0.20764434806180537,
+        "mean_score": 0.20983363687992096,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "sex",
         "group": "masculino",
-        "n": 2372,
-        "approval_rate": 0.7445193929173693,
-        "approval_rate_good_payers": 0.8352745424292846,
-        "default_rate": 0.23988195615514335,
-        "mean_score": 0.22870932519435883,
-        "disparate_impact": 0.9571638403629397,
-        "equal_opportunity_gap": 0.029469707484893304,
-        "adverse_impact": false
+        "n": 2311,
+        "compared": true,
+        "approval_rate": 0.7369104283859801,
+        "approval_rate_good_payers": 0.8344788087056129,
+        "default_rate": 0.2444829078321073,
+        "mean_score": 0.22876974940299988,
+        "disparate_impact": 0.9541813163621904,
+        "disparate_impact_ci": [
+          0.9259736381578001,
+          0.9832482772468796
+        ],
+        "equal_opportunity_gap": 0.022859542303624192,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "18-29",
-        "n": 1878,
-        "approval_rate": 0.7326943556975506,
-        "approval_rate_good_payers": 0.828060522696011,
-        "default_rate": 0.22577209797657083,
-        "mean_score": 0.238567054271698,
-        "disparate_impact": 0.9315097342379534,
-        "equal_opportunity_gap": 0.045970485055926935,
-        "adverse_impact": false
+        "n": 1883,
+        "compared": true,
+        "approval_rate": 0.745618693574084,
+        "approval_rate_good_payers": 0.8300609343263372,
+        "default_rate": 0.21561338289962825,
+        "mean_score": 0.229242742061615,
+        "disparate_impact": 0.9530589781550303,
+        "disparate_impact_ci": [
+          0.9211034136658564,
+          0.9861231674594763
+        ],
+        "equal_opportunity_gap": 0.036202136669810314,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "30-39",
-        "n": 2263,
-        "approval_rate": 0.7865665046398586,
-        "approval_rate_good_payers": 0.8611561318206374,
-        "default_rate": 0.18205921343349535,
-        "mean_score": 0.20079496502876282,
+        "n": 2288,
+        "compared": true,
+        "approval_rate": 0.7823426573426573,
+        "approval_rate_good_payers": 0.8662630709961475,
+        "default_rate": 0.20585664335664336,
+        "mean_score": 0.20089086890220642,
         "disparate_impact": 1.0,
-        "equal_opportunity_gap": 0.012874875931300545,
-        "adverse_impact": false
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
+        "equal_opportunity_gap": 0.0,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "40-49",
-        "n": 1345,
-        "approval_rate": 0.7784386617100372,
-        "approval_rate_good_payers": 0.874031007751938,
-        "default_rate": 0.23271375464684016,
-        "mean_score": 0.21256579458713531,
-        "disparate_impact": 0.9896666805897832,
-        "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "n": 1286,
+        "compared": true,
+        "approval_rate": 0.749611197511664,
+        "approval_rate_good_payers": 0.8475609756097561,
+        "default_rate": 0.23483670295489892,
+        "mean_score": 0.21672306954860687,
+        "disparate_impact": 0.958162245757926,
+        "disparate_impact_ci": [
+          0.9221826453477842,
+          0.9955456154237613
+        ],
+        "equal_opportunity_gap": 0.01870209538639145,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "50+",
-        "n": 514,
-        "approval_rate": 0.7490272373540856,
-        "approval_rate_good_payers": 0.8575197889182058,
-        "default_rate": 0.26264591439688717,
-        "mean_score": 0.21949243545532227,
-        "disparate_impact": 0.9522745158046606,
-        "equal_opportunity_gap": 0.01651121883373219,
-        "adverse_impact": false
+        "n": 543,
+        "compared": true,
+        "approval_rate": 0.7255985267034991,
+        "approval_rate_good_payers": 0.8414322250639387,
+        "default_rate": 0.27992633517495397,
+        "mean_score": 0.2444843053817749,
+        "disparate_impact": 0.9274689548031319,
+        "disparate_impact_ci": [
+          0.8769073830136365,
+          0.9809458544725667
+        ],
+        "equal_opportunity_gap": 0.024830845932208856,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "ensino médio",
-        "n": 970,
-        "approval_rate": 0.6938144329896907,
-        "approval_rate_good_payers": 0.8025387870239774,
-        "default_rate": 0.2690721649484536,
-        "mean_score": 0.25306493043899536,
-        "disparate_impact": 0.8553821377683585,
-        "equal_opportunity_gap": 0.07630080341970857,
-        "adverse_impact": false
+        "n": 1023,
+        "compared": true,
+        "approval_rate": 0.729227761485826,
+        "approval_rate_good_payers": 0.8297587131367292,
+        "default_rate": 0.270772238514174,
+        "mean_score": 0.23609447479248047,
+        "disparate_impact": 0.9042079453884534,
+        "disparate_impact_ci": [
+          0.8663057938695028,
+          0.9437683717336045
+        ],
+        "equal_opportunity_gap": 0.049311054305131274,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "graduação",
-        "n": 2825,
-        "approval_rate": 0.7490265486725664,
-        "approval_rate_good_payers": 0.8466144633809305,
-        "default_rate": 0.23150442477876107,
-        "mean_score": 0.22917039692401886,
-        "disparate_impact": 0.9234514302159456,
-        "equal_opportunity_gap": 0.03222512706275549,
-        "adverse_impact": false
+        "n": 2783,
+        "compared": true,
+        "approval_rate": 0.7290693496227093,
+        "approval_rate_good_payers": 0.8288288288288288,
+        "default_rate": 0.24218469277757815,
+        "mean_score": 0.23439307510852814,
+        "disparate_impact": 0.9040115221681112,
+        "disparate_impact_ci": [
+          0.8765403214770868,
+          0.9323436836716796
+        ],
+        "equal_opportunity_gap": 0.050240938613031694,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "education",
+        "group": "outros",
+        "n": 96,
+        "compared": false,
+        "approval_rate": 0.8854166666666666,
+        "approval_rate_good_payers": 0.8936170212765957,
+        "default_rate": 0.020833333333333332,
+        "mean_score": 0.16388793289661407
       },
       {
         "attribute": "education",
         "group": "pós-graduação",
-        "n": 2123,
-        "approval_rate": 0.8111163447951013,
-        "approval_rate_good_payers": 0.878839590443686,
-        "default_rate": 0.17192651907677814,
-        "mean_score": 0.18660663068294525,
+        "n": 2098,
+        "compared": true,
+        "approval_rate": 0.8064823641563393,
+        "approval_rate_good_payers": 0.8790697674418605,
+        "default_rate": 0.1801715919923737,
+        "mean_score": 0.18741156160831451,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "marriage",
         "group": "casado(a)",
-        "n": 2791,
-        "approval_rate": 0.7606592619132927,
-        "approval_rate_good_payers": 0.8537822878228782,
-        "default_rate": 0.223217484772483,
-        "mean_score": 0.21793293952941895,
-        "disparate_impact": 0.9921228972599803,
-        "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "n": 2781,
+        "compared": true,
+        "approval_rate": 0.7421790722761596,
+        "approval_rate_good_payers": 0.842230695900858,
+        "default_rate": 0.2455951096727796,
+        "mean_score": 0.22314584255218506,
+        "disparate_impact": 0.9572769479029941,
+        "disparate_impact_ci": [
+          0.9300240524891841,
+          0.9853284466501784
+        ],
+        "equal_opportunity_gap": 0.012358100285077667,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "marriage",
+        "group": "outros",
+        "n": 77,
+        "compared": false,
+        "approval_rate": 0.6753246753246753,
+        "approval_rate_good_payers": 0.8333333333333334,
+        "default_rate": 0.2987012987012987,
+        "mean_score": 0.2759672999382019
       },
       {
         "attribute": "marriage",
         "group": "solteiro(a)",
-        "n": 3129,
-        "approval_rate": 0.7666986257590285,
-        "approval_rate_good_payers": 0.8526104417670682,
-        "default_rate": 0.20421860019175456,
-        "mean_score": 0.2162865847349167,
+        "n": 3142,
+        "compared": true,
+        "approval_rate": 0.7753023551877785,
+        "approval_rate_good_payers": 0.8545887961859356,
+        "default_rate": 0.19891788669637173,
+        "mean_score": 0.21035809814929962,
         "disparate_impact": 1.0,
-        "equal_opportunity_gap": 0.0011718460558099997,
-        "adverse_impact": false
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
+        "equal_opportunity_gap": 0.0,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       }
     ],
     "drift_de_dados": [
       {
         "attribute": "sex",
         "group": "feminino",
-        "n": 5930,
-        "approval_rate": 0.6645868465430017,
-        "approval_rate_good_payers": 0.8039719626168225,
-        "default_rate": 0.2782462057335582,
-        "mean_score": 0.2665095329284668,
+        "n": 5956,
+        "compared": true,
+        "approval_rate": 0.662357286769644,
+        "approval_rate_good_payers": 0.7928176795580111,
+        "default_rate": 0.2706514439220954,
+        "mean_score": 0.2661878764629364,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "sex",
         "group": "masculino",
-        "n": 4070,
-        "approval_rate": 0.6277641277641277,
-        "approval_rate_good_payers": 0.7732181425485961,
-        "default_rate": 0.3174447174447175,
-        "mean_score": 0.28758716583251953,
-        "disparate_impact": 0.9445930671507935,
-        "equal_opportunity_gap": 0.030753820068226356,
-        "adverse_impact": false
+        "n": 4044,
+        "compared": true,
+        "approval_rate": 0.629080118694362,
+        "approval_rate_good_payers": 0.7658659017569022,
+        "default_rate": 0.31033630069238377,
+        "mean_score": 0.2830679416656494,
+        "disparate_impact": 0.9497594897195488,
+        "disparate_impact_ci": [
+          0.9218613349202825,
+          0.9785019222986953
+        ],
+        "equal_opportunity_gap": 0.02695177780110891,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "18-29",
-        "n": 3828,
-        "approval_rate": 0.6230407523510971,
-        "approval_rate_good_payers": 0.7667161961367014,
-        "default_rate": 0.296760710553814,
-        "mean_score": 0.2899194657802582,
-        "disparate_impact": 0.9125292598168618,
-        "equal_opportunity_gap": 0.04862690332359154,
-        "adverse_impact": false
+        "n": 3759,
+        "compared": true,
+        "approval_rate": 0.6187815908486299,
+        "approval_rate_good_payers": 0.7604562737642585,
+        "default_rate": 0.3003458366586858,
+        "mean_score": 0.2897995710372925,
+        "disparate_impact": 0.9113700278444297,
+        "disparate_impact_ci": [
+          0.8812015064132811,
+          0.9425713887325218
+        ],
+        "equal_opportunity_gap": 0.0380399668372452,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "30-39",
-        "n": 3562,
-        "approval_rate": 0.6827624929814711,
-        "approval_rate_good_payers": 0.8153430994602929,
-        "default_rate": 0.2717574396406513,
-        "mean_score": 0.25655636191368103,
+        "n": 3607,
+        "compared": true,
+        "approval_rate": 0.678957582478514,
+        "approval_rate_good_payers": 0.7984962406015037,
+        "default_rate": 0.26254505128915995,
+        "mean_score": 0.2564700245857239,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "40-49",
-        "n": 1928,
-        "approval_rate": 0.6493775933609959,
-        "approval_rate_good_payers": 0.8046153846153846,
-        "default_rate": 0.3257261410788382,
-        "mean_score": 0.27507463097572327,
-        "disparate_impact": 0.9511032021183665,
-        "equal_opportunity_gap": 0.01072771484490831,
-        "adverse_impact": false
+        "n": 1896,
+        "compared": true,
+        "approval_rate": 0.6545358649789029,
+        "approval_rate_good_payers": 0.7917602996254681,
+        "default_rate": 0.2958860759493671,
+        "mean_score": 0.2703818678855896,
+        "disparate_impact": 0.9640305696116386,
+        "disparate_impact_ci": [
+          0.926544959988019,
+          1.0030327499247935
+        ],
+        "equal_opportunity_gap": 0.0067359409760355815,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "50+",
-        "n": 682,
-        "approval_rate": 0.626099706744868,
-        "approval_rate_good_payers": 0.7711864406779662,
-        "default_rate": 0.30791788856304986,
-        "mean_score": 0.28866833448410034,
-        "disparate_impact": 0.9170095211452385,
-        "equal_opportunity_gap": 0.044156658782326774,
-        "adverse_impact": false
+        "n": 738,
+        "compared": true,
+        "approval_rate": 0.6409214092140921,
+        "approval_rate_good_payers": 0.7854330708661418,
+        "default_rate": 0.3116531165311653,
+        "mean_score": 0.2751407027244568,
+        "disparate_impact": 0.9439785720846183,
+        "disparate_impact_ci": [
+          0.8903584655192212,
+          1.0008278452603514
+        ],
+        "equal_opportunity_gap": 0.013063169735361924,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "ensino médio",
-        "n": 1724,
-        "approval_rate": 0.589907192575406,
-        "approval_rate_good_payers": 0.7440423654015887,
-        "default_rate": 0.3428074245939675,
-        "mean_score": 0.30418145656585693,
-        "disparate_impact": 0.8341119812224047,
-        "equal_opportunity_gap": 0.08319340695613486,
-        "adverse_impact": false
+        "n": 1643,
+        "compared": true,
+        "approval_rate": 0.5940353012781497,
+        "approval_rate_good_payers": 0.7248868778280543,
+        "default_rate": 0.3274497869750457,
+        "mean_score": 0.3009030222892761,
+        "disparate_impact": 0.8324559185921632,
+        "disparate_impact_ci": [
+          0.7954770864027187,
+          0.8711537619932049
+        ],
+        "equal_opportunity_gap": 0.09840947716402182,
+        "adverse_impact": false,
+        "verdict": "inconclusivo"
       },
       {
         "attribute": "education",
         "group": "graduação",
-        "n": 4875,
-        "approval_rate": 0.6276923076923077,
-        "approval_rate_good_payers": 0.7803640704267383,
-        "default_rate": 0.31261538461538463,
-        "mean_score": 0.2896846830844879,
-        "disparate_impact": 0.8875390586127972,
-        "equal_opportunity_gap": 0.04687170193098533,
-        "adverse_impact": false
+        "n": 4931,
+        "compared": true,
+        "approval_rate": 0.6197525856824173,
+        "approval_rate_good_payers": 0.7689583948067277,
+        "default_rate": 0.31271547353477996,
+        "mean_score": 0.2900395691394806,
+        "disparate_impact": 0.8684950320360731,
+        "disparate_impact_ci": [
+          0.8422061406740167,
+          0.8956045132462312
+        ],
+        "equal_opportunity_gap": 0.05433796018534842,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "education",
+        "group": "outros",
+        "n": 123,
+        "compared": false,
+        "approval_rate": 0.8130081300813008,
+        "approval_rate_good_payers": 0.8260869565217391,
+        "default_rate": 0.06504065040650407,
+        "mean_score": 0.18099719285964966
       },
       {
         "attribute": "education",
         "group": "pós-graduação",
-        "n": 3279,
-        "approval_rate": 0.707227813357731,
-        "approval_rate_good_payers": 0.8272357723577236,
-        "default_rate": 0.24977127172918573,
-        "mean_score": 0.24156884849071503,
+        "n": 3303,
+        "compared": true,
+        "approval_rate": 0.7135937026945202,
+        "approval_rate_good_payers": 0.8232963549920761,
+        "default_rate": 0.2358462004238571,
+        "mean_score": 0.23715119063854218,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "marriage",
         "group": "casado(a)",
-        "n": 4178,
-        "approval_rate": 0.6493537577788415,
-        "approval_rate_good_payers": 0.7986013986013986,
-        "default_rate": 0.3154619435136429,
-        "mean_score": 0.2757225036621094,
-        "disparate_impact": 0.998031933158057,
+        "n": 4286,
+        "compared": true,
+        "approval_rate": 0.648623425104993,
+        "approval_rate_good_payers": 0.7895266868076536,
+        "default_rate": 0.3049463369108726,
+        "mean_score": 0.27155062556266785,
+        "disparate_impact": 0.9963354066290415,
+        "disparate_impact_ci": [
+          0.9676514706652226,
+          1.0258696158651273
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "marriage",
+        "group": "outros",
+        "n": 115,
+        "compared": false,
+        "approval_rate": 0.5565217391304348,
+        "approval_rate_good_payers": 0.6206896551724138,
+        "default_rate": 0.24347826086956523,
+        "mean_score": 0.3247322738170624
       },
       {
         "attribute": "marriage",
         "group": "solteiro(a)",
-        "n": 5676,
-        "approval_rate": 0.6506342494714588,
-        "approval_rate_good_payers": 0.789087350134573,
-        "default_rate": 0.2799506694855532,
-        "mean_score": 0.2740764915943146,
+        "n": 5599,
+        "compared": true,
+        "approval_rate": 0.6510091087694231,
+        "approval_rate_good_payers": 0.7804278337841161,
+        "default_rate": 0.2736202893373817,
+        "mean_score": 0.2730722427368164,
         "disparate_impact": 1.0,
-        "equal_opportunity_gap": 0.009514048466825575,
-        "adverse_impact": false
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
+        "equal_opportunity_gap": 0.009098853023537523,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       }
     ],
     "drift_de_conceito": [
       {
         "attribute": "sex",
         "group": "feminino",
-        "n": 4737,
-        "approval_rate": 0.5710365210048554,
-        "approval_rate_good_payers": 0.6648298217179903,
-        "default_rate": 0.34874393075786364,
-        "mean_score": 0.3078748881816864,
+        "n": 4684,
+        "compared": true,
+        "approval_rate": 0.5828351836037575,
+        "approval_rate_good_payers": 0.6718903036238981,
+        "default_rate": 0.3460717335610589,
+        "mean_score": 0.30489543080329895,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "sex",
         "group": "masculino",
-        "n": 3263,
-        "approval_rate": 0.5209929512718358,
-        "approval_rate_good_payers": 0.6064676616915423,
-        "default_rate": 0.3840024517315354,
-        "mean_score": 0.3275873363018036,
-        "disparate_impact": 0.9123636266819543,
-        "equal_opportunity_gap": 0.05836216002644801,
-        "adverse_impact": false
+        "n": 3316,
+        "compared": true,
+        "approval_rate": 0.5331724969843185,
+        "approval_rate_good_payers": 0.6205027106949236,
+        "default_rate": 0.3881182147165259,
+        "mean_score": 0.3274384140968323,
+        "disparate_impact": 0.9147911999540467,
+        "disparate_impact_ci": [
+          0.8789072972845567,
+          0.9521401655201263
+        ],
+        "equal_opportunity_gap": 0.051387592928974546,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "18-29",
-        "n": 3785,
-        "approval_rate": 0.5482166446499339,
-        "approval_rate_good_payers": 0.6323833126807105,
-        "default_rate": 0.36036988110964335,
-        "mean_score": 0.31850215792655945,
-        "disparate_impact": 0.959470680683251,
-        "equal_opportunity_gap": 0.03100592965590032,
-        "adverse_impact": false
+        "n": 3761,
+        "compared": true,
+        "approval_rate": 0.552512629619782,
+        "approval_rate_good_payers": 0.6323283082077052,
+        "default_rate": 0.36506248338207925,
+        "mean_score": 0.3205406665802002,
+        "disparate_impact": 0.9489037384915244,
+        "disparate_impact_ci": [
+          0.9087734427897414,
+          0.9908061377312024
+        ],
+        "equal_opportunity_gap": 0.04847263407733593,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "30-39",
-        "n": 2620,
-        "approval_rate": 0.5713740458015267,
-        "approval_rate_good_payers": 0.6633892423366108,
-        "default_rate": 0.34007633587786257,
-        "mean_score": 0.3058822453022003,
+        "n": 2650,
+        "compared": true,
+        "approval_rate": 0.5822641509433962,
+        "approval_rate_good_payers": 0.6808009422850412,
+        "default_rate": 0.35924528301886793,
+        "mean_score": 0.30321571230888367,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "40-49",
-        "n": 1243,
-        "approval_rate": 0.5349959774738536,
-        "approval_rate_good_payers": 0.6356275303643725,
-        "default_rate": 0.40386162510056317,
-        "mean_score": 0.3187337815761566,
-        "disparate_impact": 0.9363323052648607,
-        "equal_opportunity_gap": 0.027761711972238312,
-        "adverse_impact": false
+        "n": 1259,
+        "compared": true,
+        "approval_rate": 0.5575853852263701,
+        "approval_rate_good_payers": 0.6550435865504358,
+        "default_rate": 0.36219221604447976,
+        "mean_score": 0.31655409932136536,
+        "disparate_impact": 0.9576158592675832,
+        "disparate_impact_ci": [
+          0.9029044865270194,
+          1.015642460087997
+        ],
+        "equal_opportunity_gap": 0.02575735573460536,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "age_band",
         "group": "50+",
-        "n": 352,
-        "approval_rate": 0.4772727272727273,
-        "approval_rate_good_payers": 0.5931372549019608,
-        "default_rate": 0.42045454545454547,
-        "mean_score": 0.35281941294670105,
-        "disparate_impact": 0.8353069775915467,
-        "equal_opportunity_gap": 0.07025198743465,
-        "adverse_impact": false
+        "n": 330,
+        "compared": true,
+        "approval_rate": 0.5303030303030303,
+        "approval_rate_good_payers": 0.6157635467980296,
+        "default_rate": 0.38484848484848483,
+        "mean_score": 0.32211920619010925,
+        "disparate_impact": 0.9107602270272392,
+        "disparate_impact_ci": [
+          0.8187193745903667,
+          1.0131483593505133
+        ],
+        "equal_opportunity_gap": 0.0650373954870116,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "education",
         "group": "ensino médio",
-        "n": 1357,
-        "approval_rate": 0.5187914517317612,
-        "approval_rate_good_payers": 0.5968712394705175,
-        "default_rate": 0.38761974944731026,
-        "mean_score": 0.3282719552516937,
-        "disparate_impact": 0.8399647794276756,
-        "equal_opportunity_gap": 0.11697866901026355,
-        "adverse_impact": false
+        "n": 1318,
+        "compared": true,
+        "approval_rate": 0.5136570561456753,
+        "approval_rate_good_payers": 0.5867665418227216,
+        "default_rate": 0.3922610015174507,
+        "mean_score": 0.3350852429866791,
+        "disparate_impact": 0.8212361316820078,
+        "disparate_impact_ci": [
+          0.7726641589891847,
+          0.8728614833931598
+        ],
+        "equal_opportunity_gap": 0.13205986404524905,
+        "adverse_impact": false,
+        "verdict": "inconclusivo"
       },
       {
         "attribute": "education",
         "group": "graduação",
-        "n": 4162,
-        "approval_rate": 0.5180201826045171,
-        "approval_rate_good_payers": 0.6063579277864992,
-        "default_rate": 0.3877943296492071,
-        "mean_score": 0.3330788016319275,
-        "disparate_impact": 0.838716033134377,
-        "equal_opportunity_gap": 0.10749198069428179,
-        "adverse_impact": false
+        "n": 4184,
+        "compared": true,
+        "approval_rate": 0.5356118546845124,
+        "approval_rate_good_payers": 0.6239316239316239,
+        "default_rate": 0.3847992351816444,
+        "mean_score": 0.32945385575294495,
+        "disparate_impact": 0.8563375161722445,
+        "disparate_impact_ci": [
+          0.8212210020898213,
+          0.8929556596067701
+        ],
+        "equal_opportunity_gap": 0.0948947819363467,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "education",
+        "group": "outros",
+        "n": 95,
+        "compared": false,
+        "approval_rate": 0.8105263157894737,
+        "approval_rate_good_payers": 0.8024691358024691,
+        "default_rate": 0.14736842105263157,
+        "mean_score": 0.19914625585079193
       },
       {
         "attribute": "education",
         "group": "pós-graduação",
-        "n": 2393,
-        "approval_rate": 0.6176347680735479,
-        "approval_rate_good_payers": 0.713849908480781,
-        "default_rate": 0.3150856665273715,
-        "mean_score": 0.2830820381641388,
+        "n": 2403,
+        "compared": true,
+        "approval_rate": 0.6254681647940075,
+        "approval_rate_good_payers": 0.7188264058679706,
+        "default_rate": 0.3191843528922181,
+        "mean_score": 0.28086555004119873,
         "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       },
       {
         "attribute": "marriage",
         "group": "casado(a)",
-        "n": 3025,
-        "approval_rate": 0.5365289256198347,
-        "approval_rate_good_payers": 0.6437837837837838,
-        "default_rate": 0.3884297520661157,
-        "mean_score": 0.32337427139282227,
-        "disparate_impact": 0.9603532807458959,
+        "n": 2974,
+        "compared": true,
+        "approval_rate": 0.5638870208473437,
+        "approval_rate_good_payers": 0.6626833242802824,
+        "default_rate": 0.38096839273705446,
+        "mean_score": 0.3170114755630493,
+        "disparate_impact": 1.0,
+        "disparate_impact_ci": [
+          1.0,
+          1.0
+        ],
         "equal_opportunity_gap": 0.0,
-        "adverse_impact": false
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
+      },
+      {
+        "attribute": "marriage",
+        "group": "outros",
+        "n": 111,
+        "compared": false,
+        "approval_rate": 0.5585585585585585,
+        "approval_rate_good_payers": 0.5428571428571428,
+        "default_rate": 0.36936936936936937,
+        "mean_score": 0.32826197147369385
       },
       {
         "attribute": "marriage",
         "group": "solteiro(a)",
-        "n": 4874,
-        "approval_rate": 0.5586787033237587,
-        "approval_rate_good_payers": 0.6418004406672962,
-        "default_rate": 0.3481739844070579,
-        "mean_score": 0.31124284863471985,
-        "disparate_impact": 1.0,
-        "equal_opportunity_gap": 0.0019833431164875126,
-        "adverse_impact": false
+        "n": 4915,
+        "compared": true,
+        "approval_rate": 0.5613428280773144,
+        "approval_rate_good_payers": 0.6472807293303993,
+        "default_rate": 0.35279755849440486,
+        "mean_score": 0.31224557757377625,
+        "disparate_impact": 0.9954881161013315,
+        "disparate_impact_ci": [
+          0.9563380721256779,
+          1.0362408631251747
+        ],
+        "equal_opportunity_gap": 0.015402594949883164,
+        "adverse_impact": false,
+        "verdict": "dentro do limite"
       }
     ]
   },
