@@ -62,6 +62,12 @@ def make_settings(root: Path, **overrides) -> Settings:
     return Settings(_env_file=None, **values)
 
 
+@pytest.fixture
+def isolated_settings(tmp_path: Path) -> Settings:
+    """Settings apontando para um diretorio temporario vazio."""
+    return make_settings(tmp_path)
+
+
 @pytest.fixture(scope="session")
 def raw_frame() -> pd.DataFrame:
     return load_raw_dataset(RAW_DATASET, download_if_missing=False)
@@ -114,6 +120,6 @@ def workspace(tmp_path_factory: pytest.TempPathFactory) -> Workspace:
     run_train(settings, StageTracker("train", settings.events_path))
     run_simulate(settings, StageTracker("simulate", settings.events_path))
     overview = run_monitor(settings, StageTracker("monitor", settings.events_path), evidently="none")
-    analysis = run_analyze(settings, StageTracker("analyze", settings.events_path), attribution_sample=1500)
+    analysis = run_analyze(settings, StageTracker("analyze", settings.events_path), attribution_seeds=2)
     dashboard = run_dashboard(settings, StageTracker("dashboard", settings.events_path))
     return Workspace(settings=settings, overview=overview, analysis=analysis, dashboard=dashboard)
