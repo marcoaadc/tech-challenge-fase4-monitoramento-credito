@@ -1,6 +1,6 @@
 [project]
 name = "creditwatch"
-version = "1.0.0"
+version = "1.1.0"
 description = "Sustentacao e confiabilidade de um modelo de credit scoring: contratos de dados (Pandera), deteccao de drift (Evidently), observabilidade (MLflow, Prometheus) e governanca LGPD"
 authors = [{ name = "Marco", email = "marcoaadc@gmail.com" }]
 readme = "README.md"
