@@ -266,7 +266,7 @@ Detalhes, catálogo completo de métricas e exemplos em [docs/observabilidade.md
 | **Logs centralizados** | [`pipeline_log.jsonl`](reports/observability/pipeline_log.jsonl) | Todos os estágios no mesmo arquivo JSON Lines, com o `run_id` da execução; nunca valores de linhas. O log da execução de referência fica versionado |
 | **Eventos de estágio** | [`pipeline_events.jsonl`](reports/observability/pipeline_events.jsonl) | Um evento por estágio: status (`success`, `blocked`, `failed`), duração, tempo de CPU, linhas de entrada e de saída |
 | **Alertas** | [`alerts.jsonl`](reports/observability/alerts.jsonl) | Seis famílias: qualidade de dados, drift de dados, drift de predição, drift do alvo, performance e calibração |
-| **Rastreamento** | MLflow (`sqlite:///mlflow.db`) | Experimento de treino com o modelo registrado; experimento de monitoramento com a série temporal de cada métrica e um run por remessa. O banco não é versionado; [`mlflow_summary.json`](reports/observability/mlflow_summary.json) lista o que ele contém |
+| **Rastreamento** | MLflow (`sqlite:///mlflow.db`), figuras em [`docs/img/`](docs/img/mlflow_monitoramento.png) | Experimento de treino com o modelo registrado; experimento de monitoramento com a série temporal de cada métrica e um run por remessa. O banco não é versionado; [`mlflow_summary.json`](reports/observability/mlflow_summary.json) lista o que ele contém |
 | **Métricas** | [`metrics.prom`](reports/observability/metrics.prom) | Formato Prometheus (textfile collector ou Pushgateway), para integrar à stack da Fase 3 |
 | **Dashboard** | [`reports/dashboard/index.html`](reports/dashboard/index.html) | HTML único, sem dependência externa, com tabela equivalente para cada gráfico |
 
@@ -609,6 +609,7 @@ O [`dependabot.yml`](.github/dependabot.yml) mantém actions e dependências atu
 │   └── pipelines/                    # CLIs: ingest, train, simulate, monitor, analyze, dashboard, validate, run_all
 ├── tests/                            # 221 testes (pytest)
 ├── docs/                             # Contrato, drift, observabilidade, runbook, model card, ADRs
+├── scripts/                          # Figuras do MLflow para a documentação
 ├── .github/                          # CI e Dependabot
 └── Makefile · pyproject.toml · poetry.lock · CHANGELOG.md · CONTRIBUTING.md
 ```

@@ -131,6 +131,14 @@ make mlflow-ui     # http://127.0.0.1:5000
 | `creditwatch-treino` | 1 run pai + 1 filho por candidato (3 no total) | Hiperparâmetros, métricas de validação de cada candidato, métricas de teste do escolhido, `metadata.json` e o modelo com assinatura, registrado como `credit-scoring-baseline` (versão 1) no Model Registry |
 | `creditwatch-monitoramento` | 1 run pai por execução + 1 filho por remessa (14 no total) | No run pai, as métricas de cada remessa são logadas com `step`, e a aba de métricas mostra a série temporal de `performance/roc_auc`, `drift/n_drifted`, `psi/<feature>`, `prediction/score_psi` e `alerts/critical` (71 métricas). Cada run filho guarda o plano do mês como parâmetros, o resumo JSON e o relatório do Evidently como artefatos |
 
+Séries do run pai do monitoramento, lidas do banco com `get_metric_history` e desenhadas por [`scripts/mlflow_figures.py`](../scripts/mlflow_figures.py) (`make mlflow-figures`):
+
+![Métricas do MLflow por remessa](img/mlflow_monitoramento.png)
+
+O run pai do treino guarda os candidatos como runs filhos; a comparação na validação é o que decide o modelo registrado:
+
+![Candidatos do treino no MLflow](img/mlflow_treino.png)
+
 O banco do MLflow não é versionado. [`mlflow_summary.json`](../reports/observability/mlflow_summary.json) é gerado ao fim da execução e lista os experimentos, os runs, a contagem de métricas e parâmetros de cada um e os modelos registrados.
 
 O modelo é registrado no formato nativo de cada biblioteca, sem pickle: XGBoost em UBJ (`mlflow.xgboost`) e pipelines scikit-learn em skops (`mlflow.sklearn`).

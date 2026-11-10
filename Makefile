@@ -5,7 +5,7 @@ MLFLOW_URI ?= sqlite:///mlflow.db
 BAD_BATCH  ?= data/production/batch_2025-07_remessa1_corrompida.parquet
 
 .PHONY: help install lint format test test-fast test-cov pipeline ingest train simulate monitor analyze \
-        dashboard demo-bad-batch evidently-all mlflow-ui serve-reports clean
+        dashboard demo-bad-batch evidently-all mlflow-ui mlflow-figures serve-reports clean
 
 help:
 	@echo "Alvos disponiveis:"
@@ -19,6 +19,7 @@ help:
 	@echo "  demo-bad-batch  Valida o lote corrompido: o contrato bloqueia e o comando sai com codigo 1"
 	@echo "  evidently-all   Regera o monitoramento com relatorio do Evidently para os 12 meses"
 	@echo "  mlflow-ui       Abre a UI do MLflow em http://127.0.0.1:5000"
+	@echo "  mlflow-figures  Gera as figuras do MLflow em docs/img a partir de mlflow.db"
 	@echo "  serve-reports   Serve reports/ em http://127.0.0.1:8000/dashboard/"
 	@echo "  clean           Remove caches e artefatos temporarios"
 
@@ -73,6 +74,9 @@ evidently-all:
 
 mlflow-ui:
 	poetry run mlflow ui --backend-store-uri $(MLFLOW_URI) --host 127.0.0.1 --port 5000
+
+mlflow-figures:
+	CREDITWATCH_MLFLOW_TRACKING_URI=$(MLFLOW_URI) poetry run python scripts/mlflow_figures.py
 
 serve-reports:
 	poetry run python -m http.server 8000 --bind 127.0.0.1 --directory reports
